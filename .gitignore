@@ -57,3 +57,6 @@ yarn-error.log*
 # 操作系统文件
 .DS_Store
 Thumbs.db
+
+# 其他代码
+/wechat_miniprogram_code
