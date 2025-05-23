@@ -1,0 +1,80 @@
+/* 
+此文件为开发者工具生成，生成时间: 2024/4/12下午12:49:55
+使用方法：
+在 index.wxss 文件末尾引入样式
+```
+@import "./index-wxa-auto-dark.wxss";
+```
+ */
+
+@media (prefers-color-scheme: dark) {
+    .long-content{
+        background-color: rgba(255, 255, 255, 0.103);
+        color: white;
+    }
+    .home-help-dlg-content button{
+        background-color: rgb(141, 141, 141);
+        color: white;
+    }
+    .long-content .qacontent {
+        color: rgb(187, 187, 187);
+    }
+    
+    .t-dialog{
+        background-color: rgba(10, 10, 10, 0.89) !important;
+        color: rgba(255, 255, 255, 0.678) !important;
+        --td-dialog-title-color: white;
+    }
+
+    .input-title {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-tips {
+        color: rgb(171, 171, 171);
+    }
+
+    .home-input {
+        --td-input-bg-color: rgba(44, 44, 44, 1);
+        --td-input-border-color: rgba(75, 75, 75, 1);
+        --td-input-default-text-color: rgba(255, 255, 255, 1);
+        --td-input-placeholder-text-color: rgba(255, 255, 255, 0.35);
+        --td-input-label-text-color: rgba(255, 255, 255, 1);
+    }
+
+    .home-picker{
+        --td-cell-bg-color: rgba(44, 44, 44, 1);
+        --td-cell-note-color: rgb(184, 184, 184);
+        --td-cell-title-color: white !important;
+    }
+
+    .grid_block{
+        --td-grid-bg-color: rgb(63, 63, 63);
+        --td-grid-item-bg-color: rgb(63, 63, 63);
+        --td-grid-item-hover-bg-color: rgba(44, 44, 44, 1);
+        
+        color: rgba(255, 255, 255, 1);
+    }
+
+    .home-progress{
+        --td-progress-circle-inner-bg-color: rgb(151, 151, 151);
+    }
+
+    .home-message{
+        --td-message-bg-color: rgba(10, 10, 10, 0.671);
+        --td-message-content-font-color: rgba(255, 145, 0, 0.76);
+    }
+
+    .page {
+        background-color: rgb(63, 63, 63);
+        --td-tab-bar-bg-color: rgb(27, 27, 27);
+        --td-tab-bar-color: white;
+        --td-divider-content-color: rgb(171, 171, 171);
+    }
+
+    .index-tab-bar{
+        --td-tab-bar-active-bg: rgba(255, 255, 255, 0.568);
+    }
+
+    
+}

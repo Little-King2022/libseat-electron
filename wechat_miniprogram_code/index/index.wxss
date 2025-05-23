@@ -1,0 +1,189 @@
+/**index.wxss**/
+/* 登陆弹窗 */
+.popup {
+    color: #333;
+    align-items: center;
+    margin: 0 8% 8%;
+    height: 240px;
+}
+/* 荧光笔效果 */
+.highlight-text {
+    position: relative;
+    display: inline-block;
+}
+.highlight-text::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65%;
+    background-color: #ccffcc;
+    z-index: -1;
+    border-radius: 3px;
+}
+
+
+/* home */
+.input-title {
+    color: rgba(0, 0, 0, 0.9);
+    font-size: 50rpx;
+    font-weight: bold;
+    line-height: 40rpx;
+    text-align: center;
+    letter-spacing: 8px;
+    padding: 8% 0 1%;
+}
+
+.input-tips {
+    color: rgb(82, 82, 82);
+    font-size: 30rpx;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px 0 0;
+}
+
+.home-input {
+    font-size: 30rpx;
+    padding: 3% 5%;
+    text-align: center;
+}
+
+.home-picker {
+    --td-cell-height: 40rpx !important;
+    --td-cell-border-width: 3px;
+    --td-cell-border-left-space: 10px;
+    --td-cell-border-right-space: 10px;
+    --td-cell-note-font-size: 28rpx;
+    --td-cell-title-color: rgba(27, 27, 27, 0.747) !important;
+}
+
+/* home下方宫格 */
+.grid_block {
+    display: block;
+    margin-bottom: 32rpx;
+}
+
+.page {
+    padding-bottom: 200rpx;
+    /* message样式 */
+    --td-message-box-shadow: var(--td-shadow-1,
+            0 5px 10px rgba(0, 0, 0, 5%),
+            0 4px 5px rgba(0, 0, 0, 8%),
+            0 2px 4px -1px rgba(0, 0, 0, 12%));
+    --td-message-content-font-color: red;
+}
+
+
+
+.long-content {
+    height: 700rpx;
+    margin-top: 20rpx;
+    font-size: 32rpx;
+    color: rgba(0, 0, 0, 0.733);
+    width: 100%;
+}
+
+.long-content .qatitle {
+    text-align: left;
+    font-size: 40rpx;
+    font-weight: bold;
+    line-height: 130%;
+}
+
+.long-content .qacontent {
+    width: 100%;
+    text-align: left;
+    font-size: 28rpx;
+    color: rgb(112, 112, 112);
+    padding: 10rpx 30rpx;
+    padding-left: 10rpx;
+}
+
+.home-message {
+    --td-message-bg-color: rgba(255, 255, 255, 0.671);
+}
+
+.atten {
+    color: rgba(240, 150, 32, 0.945);
+    font-weight: bold;
+}
+
+/* resv页面 */
+.resv-seat-list{
+    text-align: center;
+    margin: 10px auto -1px;
+    color: rgb(43, 92, 255);
+}
+.resv-detail{
+    text-align: left;
+    margin: 10px auto;
+    margin-left: 10px;
+    color: rgb(43, 92, 255);
+}
+
+/* my页面 */
+.user-info button::after {
+    border-style: none;
+}
+
+.my-resv-list-container{
+    width: 96%;
+    text-align: center;
+    margin: 0 auto;
+}
+.table {
+    width: 125%;
+    border-collapse: collapse;
+}
+.detail-table {
+    width: 140%;
+    border-collapse: collapse;
+}
+
+.table-row {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+}
+
+.header {
+    font-weight: bolder;
+    font-size: 32rpx !important;
+}
+
+.table-cell {
+    font-size: 28rpx;
+    flex: 1;
+    padding: 5px;
+    text-align: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    display: flex;
+    /* 使用 Flex 布局 */
+    justify-content: center;
+    /* 水平居中 */
+    width: min-content;
+}
+
+/* 奇数行背景色 */
+.table-row:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+.detail-table {
+    width: 110%;
+    border-collapse: collapse;
+}
+.detail-content {
+    height: 500rpx;
+    margin-top: 20rpx;
+    font-size: 32rpx;
+    color: rgba(0, 0, 0, 0.733);
+    width: 100%;
+}
+.index-tab-bar{
+    margin-bottom: 8rpx;
+}
+
+/* @import 'index-wxa-auto-dark.wxss' */

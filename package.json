@@ -1,0 +1,62 @@
+{
+  "name": "libseat-electron",
+  "private": true,
+  "version": "0.0.1",
+  "description": "LibSeat Electron Application",
+  "author": "Little-King <littleking2024@gmail.com>",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@types/body-parser": "^1.19.5",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "axios": "^1.9.0",
+    "better-sqlite3": "^11.10.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "element-plus": "^2.9.10",
+    "express": "^5.1.0",
+    "jsrsasign": "^11.1.0",
+    "pinia": "^3.0.2",
+    "vue": "^3.4.21",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.1",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "electron": "^30.0.1",
+    "electron-debug": "^1.5.0",
+    "electron-devtools-installer": "^2.2.4",
+    "electron-rebuild": "^3.2.9",
+    "typescript": "^5.2.2",
+    "vite": "^6.3.5",
+    "vite-plugin-electron": "^0.28.6",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vue-tsc": "^2.0.26"
+  },
+  "main": "electron/main.js",
+  "build": {
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "dist-electron/*",
+      "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/libseat.db",
+        "to": "assets/libseat.db"
+      },
+      {
+        "from": "assets/seat.pdf",
+        "to": "assets/seat.pdf"
+      }
+    ]
+  }
+}
