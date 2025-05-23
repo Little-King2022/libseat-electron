@@ -44,7 +44,7 @@ LibSeat 是一个基于 Electron 和 Vue.js 开发的跨平台图书馆座位预
 
 1. 克隆项目
 ```bash
-git clone https://github.com/yourusername/libseat-electron.git
+git clone https://github.com/Little-King2022/libseat-electron.git
 cd libseat-electron
 ```
 
