@@ -8,10 +8,17 @@ const DB_NAME = 'libseat.db';
 
 // 获取用户目录路径
 const userDbPath = path.join(app.getPath('userData'), DB_NAME);
-
+console.log('📂 用户数据库路径：', userDbPath);
 // 获取模板数据库路径（在 resources/assets 目录下）
-const templateDbPath = path.join(process.resourcesPath, 'assets', DB_NAME);
-
+if (!app.isPackaged) {
+  // 开发模式下直接从项目目录下读取 assets 目录
+  templateDbPath = path.join(__dirname, '../assets', DB_NAME);
+  console.log('📂 模板数据库路径：', templateDbPath);
+} else {
+  // 打包后从 app.asar 的 resources 路径中读取
+  templateDbPath = path.join(process.resourcesPath, 'assets', DB_NAME);
+  console.log('📂 模板数据库路径：', templateDbPath);
+}
 // 如果用户目录下数据库不存在，则复制模板
 if (!fs.existsSync(userDbPath)) {
   try {

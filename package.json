@@ -1,7 +1,7 @@
 {
   "name": "libseat-electron",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "LibSeat Electron Application",
   "author": "Little-King <littleking2024@gmail.com>",
   "scripts": {
@@ -57,6 +57,10 @@
         "from": "assets/seat.pdf",
         "to": "assets/seat.pdf"
       }
-    ]
+    ],
+    "appId": "com.littleking.libseat",
+    "mac": {
+      "icon": "assets/icon.icns"
+    }
   }
 }

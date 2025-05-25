@@ -96,10 +96,6 @@ function createWindow() {
     },
   });
 
-  // 尝试打开开发工具
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.openDevTools({ mode: 'detach' });
-  });
 
   if (app.isPackaged) {
     const appPath = app.getAppPath();
@@ -127,6 +123,10 @@ function createWindow() {
   } else {
     // 开发环境：加载 Vite 本地服务
     win.loadURL('http://localhost:5173');
+    // 尝试打开开发工具
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.openDevTools({ mode: 'detach' });
+    });
   }
 }
 
