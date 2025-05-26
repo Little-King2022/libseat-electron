@@ -12,6 +12,8 @@ const {
   updateSystemSetting
 } = require('./services/dbService.js');
 
+const { updateSeatMenuDatabase } = require('./services/updateSeatMenuDatabaseService.js');
+
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -85,6 +87,10 @@ ipcMain.handle('open-pdf', async (event, pdfName) => {
     return { success: false, error: error.message };
   }
 });
+
+ipcMain.handle('update-seat-menu-database', async () => {
+  return await updateSeatMenuDatabase();
+})
 
 let win = null;
 

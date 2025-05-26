@@ -13,9 +13,6 @@ const loginForm = reactive({
   stu_pwd: '',
 });
 
-// 登录类型
-const loginType = ref(2); // 默认使用账号密码登录
-
 // 方法定义
 const login = async () => {
   if (!loginForm.stu_id) {

@@ -114,5 +114,3 @@ module.exports = {
     startAutoRefresh,
     stopAutoRefresh,
 };
-
-doLogin()

@@ -12,7 +12,7 @@ console.log('📂 用户数据库路径：', userDbPath);
 // 获取模板数据库路径（在 resources/assets 目录下）
 if (!app.isPackaged) {
   // 开发模式下直接从项目目录下读取 assets 目录
-  templateDbPath = path.join(__dirname, '../assets', DB_NAME);
+  templateDbPath = path.join(__dirname, '../../assets', DB_NAME);
   console.log('📂 模板数据库路径：', templateDbPath);
 } else {
   // 打包后从 app.asar 的 resources 路径中读取

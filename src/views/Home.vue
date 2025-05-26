@@ -72,13 +72,21 @@ const getLibraryData = async () => {
       console.log(lib_data.data);
       currentCount.value = parseInt(lib_data.data.currentCount);
       remainingCount.value = parseInt(lib_data.data.remainingCount);
-      inLibPercentage.value = (currentCount.value / (currentCount.value + remainingCount.value) * 100).toFixed(0);
+      if (remainingCount.value == 0 || currentCount.value == 0) {
+        inLibPercentage.value = 0;
+      } else {
+        inLibPercentage.value = (currentCount.value / (currentCount.value + remainingCount.value) * 100).toFixed(0);
+      }
 
       // resv_data
       console.log(resv_data.data);
       resvCount.value = resv_data.data.resvCount;
       freeCount.value = resv_data.data.freeCount;
-      resvPercentage.value = (resvCount.value / (resvCount.value + freeCount.value) * 100).toFixed(0);
+      if (resvCount.value == 0 || freeCount.value == 0) {
+        resvPercentage.value = 0;
+      } else {
+        resvPercentage.value = (resvCount.value / (resvCount.value + freeCount.value) * 100).toFixed(0);
+      }
     } else {
       ElMessage.error('获取预约人数失败: ' + resv_data.data.message);
     }
@@ -128,7 +136,7 @@ onMounted(() => {
     <el-card class="stats-card">
       <el-row :gutter="20">
         <!-- 在馆人数和预约人数 -->
-        <el-col :span="8">
+        <el-col :span="7">
           <div class="stats-block">
             <el-tooltip class="box-item" effect="dark" placement="top-start">
               <template #content>
@@ -157,7 +165,8 @@ onMounted(() => {
         </el-col>
 
         <!-- 各楼层座位预约率 -->
-        <el-col :span="12">
+        <el-col :span="1"></el-col>
+        <el-col :span="8">
           <h4>各楼层座位预约率</h4>
           <div class="floor-stats">
             <div class="floor-item">

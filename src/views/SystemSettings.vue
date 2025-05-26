@@ -44,7 +44,7 @@ watch(() => settings.theme, (val) => {
 // updateDatadase
 const updateDatabaseStatus = ref('正在初始化...');
 const updateDatabase = () => {
-  if (!useUserStore().isLoggedIn){
+  if (!useUserStore().isLoggedIn) {
     ElMessage.warning('请先登录');
     return;
   }
@@ -53,9 +53,22 @@ const updateDatabase = () => {
   ElNotification({
     title: '数据库更新状态',
     message: h(NotificationContent),
-    duration: 0,
+    duration: 10000,
   })
-  
+
+  setTimeout(() => {
+    window.api.invoke('update-seat-menu-database').then((res) => {
+      updateDatabaseStatus.value = res.message;
+      if (res.success) {
+        ElMessage.success('数据库更新成功');
+      } else {
+        ElMessage.error('数据库更新失败');
+      }
+    }).catch((err) => {
+      ElMessage.error('数据库更新失败: ' + err.message);
+    });
+  }, 1000);
+
 }
 </script>
 
