@@ -71,10 +71,17 @@ ipcMain.handle('open-pdf', async (event, pdfName) => {
   try {
     const pdfPath = path.join(path.dirname(app.getAppPath()), 'assets', pdfName);
     console.log('尝试打开PDF:', pdfPath);
-    await shell.openExternal(`file://${pdfPath}`);
+
+    const result = await shell.openPath(pdfPath);
+    if (result) {
+      // 有错误信息返回
+      console.error('打开PDF失败:', result);
+      return { success: false, error: result };
+    }
+
     return { success: true };
   } catch (error) {
-    console.error('Failed to open PDF:', error);
+    console.error('打开PDF异常:', error);
     return { success: false, error: error.message };
   }
 });

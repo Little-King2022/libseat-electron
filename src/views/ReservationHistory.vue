@@ -13,7 +13,7 @@
       <el-table v-show="showMyResvList" :data="myResvList" :row-class-name="tableRowClassName" style="width: 100%;"
         border height="70vh">
         <el-table-column prop="resvDevInfoList[0].devName" label="座位号" width="100" fixed />
-        <el-table-column label="状态" width="90">
+        <el-table-column label="状态" width="100">
           <template #default="scope">
             <el-tag :type="utils.resvStatusColor(scope.row.resvStatus)">
               {{ utils.resvStatus(scope.row.resvStatus) }}
@@ -157,7 +157,7 @@ const utils = {
   resvStatus(type) {
     switch (parseInt(type)) {
       case 1027:
-        return "预约成功 未开始";
+        return "预约成功";
       case 1217:
       case 5313:
         return "已结束";

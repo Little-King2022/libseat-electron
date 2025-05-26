@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const cheerio = require('cheerio');
 const app = express();
 const {
   getAllAutoAppointments,
@@ -19,38 +20,81 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // 图书馆座位数据模拟
 const libraryData = {
-  currentCount: 30,
-  remainingCount: 20,
-  resvCount: 40,
-  freeCount: 60,
+  currentCount: 0,
+  remainingCount: 0,
+  resvCount: 0,
+  freeCount: 0,
   floorData: {
-    '2': { freeNum: 20, freeRate: 40 },
-    '3': { freeNum: 25, freeRate: 50 },
-    '4': { freeNum: 30, freeRate: 60 },
-    '5': { freeNum: 15, freeRate: 30 },
-    '6': { freeNum: 35, freeRate: 70 },
-    '7': { freeNum: 40, freeRate: 80 },
+    '2': { freeNum: 0, freeRate: 0 },
+    '3': { freeNum: 0, freeRate: 0 },
+    '4': { freeNum: 0, freeRate: 0 },
+    '5': { freeNum: 0, freeRate: 0 },
+    '6': { freeNum: 0, freeRate: 0 },
+    '7': { freeNum: 0, freeRate: 0 },
   }
 };
 
 // 启动本地API服务
 function startApiServer() {
   // 获取在馆人数
-  app.get('/api/get_inlibnum', (req, res) => {
-    res.json({
-      result: 'success',
-      current_count: libraryData.currentCount,
-      remaining_count: libraryData.remainingCount
-    });
+  app.get('/api/get_inlibnum', async (req, res) => {
+    try {
+      const response = await axios.get('http://202.119.210.2:85/book/show2');
+      if (response.status === 200) {
+        const html = response.data;
+        const regex1 = /<span\s+style="color:red;font-size:200px">(\d+)<\/span>/;
+        const match1 = html.match(regex1);
+        const regex2 = /<span\s+style="color:red;font-size:150px">(\d+)<\/span>/;
+        const match2 = html.match(regex2);
+        if (match1 && match1) {
+          libraryData.currentCount = match1[1];
+          libraryData.remainingCount = match2[1];
+        } else {
+          libraryData.currentCount = '0';
+          libraryData.remainingCount = '5000';
+        }
+      }
+
+      res.json({
+        success: true,
+        currentCount: libraryData.currentCount,
+        remainingCount: libraryData.remainingCount
+      });
+    } catch (error) {
+      console.error(error);
+      res.json({ success: false, message: '获取在馆人数失败' });
+    }
   });
 
   // 获取预约统计
-  app.get('/api/get_all_resv', (req, res) => {
+  app.get('/api/get_all_resv', async (req, res) => {
+    const system = await getSystemSetting();
+    var config = {
+      method: 'get',
+      url: 'https://libseat.njfu.edu.cn/ic-web/seatDevice/resvStatus',
+      headers: {
+        'Pragma': 'no-cache',
+        'lan': '1',
+        'Cookie': system.token,
+      }
+    };
+
+    axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data.data));
+        libraryData.resvCount = response.data.data.used;
+        libraryData.freeCount = response.data.data.available;
+
+      })
+      .catch(function (error) {
+        console.log(error);
+        res.json({ success: false, message: '获取预约统计失败: ' + error });
+      });
+
     res.json({
-      result: 'success',
-      resvnum: libraryData.resvCount,
-      freenum: libraryData.freeCount,
-      freerate: (libraryData.freeCount / (libraryData.resvCount + libraryData.freeCount) * 100).toFixed(2)
+      success: true,
+      resvCount: libraryData.resvCount,
+      freeCount: libraryData.freeCount,
     });
   });
 
@@ -96,7 +140,7 @@ function startApiServer() {
 
   // 获取历史预约记录
   app.get('/api/get_resv_list', async (req, res) => {
-    const system = await getSystemSetting(); 
+    const system = await getSystemSetting();
 
     const two_month_ago = new Date();
     two_month_ago.setMonth(two_month_ago.getMonth() - 2);
@@ -137,32 +181,32 @@ function startApiServer() {
         });
       }
     })
-    .catch(function (error) {
-      if (error.response) {
-        // 服务器错误
-        res.json({
-          message: error.response.data.message,
-          success: false
-        });
-      } else if (error.request) {
-        // 网络错误
-        res.json({
-          message: '网络错误，请检查您的网络连接。',
-          success: false
-        });
-      } else {
-        // 其他错误
-        res.json({
-          message: error.message,
-          success: false
-        });
-      }
-    });
+      .catch(function (error) {
+        if (error.response) {
+          // 服务器错误
+          res.json({
+            message: error.response.data.message,
+            success: false
+          });
+        } else if (error.request) {
+          // 网络错误
+          res.json({
+            message: '网络错误，请检查您的网络连接。',
+            success: false
+          });
+        } else {
+          // 其他错误
+          res.json({
+            message: error.message,
+            success: false
+          });
+        }
+      });
   });
 
   // 获取预约详细信息
   app.get('/api/get_resv_detail', async (req, res) => {
-    const system = await getSystemSetting(); 
+    const system = await getSystemSetting();
 
     const resvId = req.query.resvId;
 
@@ -192,27 +236,27 @@ function startApiServer() {
         });
       }
     })
-    .catch(function (error) {
-      if (error.response) {
-        // 服务器错误
-        res.json({
-          message: error.response.data.message,
-          success: false
-        });
-      } else if (error.request) {
-        // 网络错误
-        res.json({
-          message: '网络错误，请检查您的网络连接。',
-          success: false
-        });
-      } else {
-        // 其他错误
-        res.json({
-          message: error.message,
-          success: false
-        });
-      }
-    });
+      .catch(function (error) {
+        if (error.response) {
+          // 服务器错误
+          res.json({
+            message: error.response.data.message,
+            success: false
+          });
+        } else if (error.request) {
+          // 网络错误
+          res.json({
+            message: '网络错误，请检查您的网络连接。',
+            success: false
+          });
+        } else {
+          // 其他错误
+          res.json({
+            message: error.message,
+            success: false
+          });
+        }
+      });
   });
 
 

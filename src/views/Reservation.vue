@@ -76,7 +76,7 @@ const showSeatPDF = async () => {
   ElMessage.success('正在打开座位分布图...')
   try {
     const pdfName = 'seat.pdf';
-    await window.api.openPDF(pdfName);
+    await window.api.invoke('open-pdf', pdfName);
   } catch (error) {
     console.error('Failed to open PDF:', error);
     ElMessage.error('无法打开座位分布图');

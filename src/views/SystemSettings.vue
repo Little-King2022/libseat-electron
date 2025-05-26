@@ -15,13 +15,20 @@
           <el-option label="跟随系统" value="auto"></el-option>
         </el-select>
       </el-form-item>
+      <!-- 更新数据库 -->
+      <el-form-item label="数据库">
+        <el-button type="primary" @click="updateDatabase" style="width: 180px;">更新图书馆数据库</el-button>
+      </el-form-item>
+
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue';
+import { reactive, ref, watch, h } from 'vue';
 import { getTheme, setTheme, applyTheme } from '../utils/theme';
+import { ElNotification, ElMessage } from 'element-plus';
+import { useUserStore } from '../stores/userStore';
 
 const settings = reactive({
   notifications: true,
@@ -33,6 +40,23 @@ watch(() => settings.theme, (val) => {
   setTheme(val);
   applyTheme(val);
 });
+
+// updateDatadase
+const updateDatabaseStatus = ref('正在初始化...');
+const updateDatabase = () => {
+  if (!useUserStore().isLoggedIn){
+    ElMessage.warning('请先登录');
+    return;
+  }
+
+  const NotificationContent = () => h('div', null, updateDatabaseStatus.value)
+  ElNotification({
+    title: '数据库更新状态',
+    message: h(NotificationContent),
+    duration: 0,
+  })
+  
+}
 </script>
 
 <style scoped>

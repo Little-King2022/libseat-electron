@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
 // 数据定义
 const seatNumber = ref('')
@@ -9,8 +10,8 @@ const seatList = ref([])
 const stuList = ref([])
 
 // 统计数据
-const inLibCount = ref(0)
-const remainCount = ref(0)
+const currentCount = ref(0)
+const remainingCount = ref(0)
 const resvCount = ref(0)
 const freeCount = ref(0)
 const inLibPercentage = ref(0)
@@ -61,25 +62,36 @@ const handleStuSelect = (student) => {
 }
 
 // 获取图书馆数据
-const getLibraryData = () => {
-  // 模拟数据，实际应从API获取
-  inLibCount.value = 320
-  remainCount.value = 180
-  resvCount.value = 450
-  freeCount.value = 50
-  inLibPercentage.value = 64
-  resvPercentage.value = 90
-  _2fPer.value = 85
-  _3fPer.value = 75
-  _4fPer.value = 60
-  _5fPer.value = 45
-  _6fPer.value = 30
-  _7fPer.value = 20
+const getLibraryData = async () => {
+  try {
+    const lib_data = await axios.get('http://localhost:3000/api/get_inlibnum');
+    const resv_data = await axios.get('http://localhost:3000/api/get_all_resv');
+
+    if (lib_data.data.success && resv_data.data.success) {
+      // lib_data
+      console.log(lib_data.data);
+      currentCount.value = parseInt(lib_data.data.currentCount);
+      remainingCount.value = parseInt(lib_data.data.remainingCount);
+      inLibPercentage.value = (currentCount.value / (currentCount.value + remainingCount.value) * 100).toFixed(0);
+
+      // resv_data
+      console.log(resv_data.data);
+      resvCount.value = resv_data.data.resvCount;
+      freeCount.value = resv_data.data.freeCount;
+      resvPercentage.value = (resvCount.value / (resvCount.value + freeCount.value) * 100).toFixed(0);
+    } else {
+      ElMessage.error('获取预约人数失败: ' + resv_data.data.message);
+    }
+  } catch (error) {
+    console.error(error);
+    ElMessage.error('获取预约人数失败: ' + error.message);
+  }
 }
 
 onMounted(() => {
-  getLibraryData()
-  // 设置定时刷新
+  setTimeout(() => {
+    getLibraryData()
+  }, 1000);
   setInterval(() => {
     getLibraryData()
   }, 60000)
@@ -96,20 +108,11 @@ onMounted(() => {
           <span class="subtitle">座位签到、查询座位使用记录、当前使用者</span>
         </div>
       </template>
-      <el-input
-        v-model="seatNumber"
-        placeholder="请输入后三位数字"
-        clearable
-        @input="handleSeatInput"
-      >
+      <el-input v-model="seatNumber" placeholder="请输入后三位数字" clearable @input="handleSeatInput">
         <template #prepend>座位编号:</template>
       </el-input>
-      
-      <el-table
-        v-if="seatList.length > 0"
-        :data="seatList"
-        style="width: 100%; margin-top: 20px;"
-      >
+
+      <el-table v-if="seatList.length > 0" :data="seatList" style="width: 100%; margin-top: 20px;">
         <el-table-column prop="seat.seat_name" label="座位号" />
         <el-table-column label="操作">
           <template #default="scope">
@@ -119,7 +122,7 @@ onMounted(() => {
       </el-table>
     </el-card>
 
-    
+
 
     <!-- 统计信息部分 -->
     <el-card class="stats-card">
@@ -127,76 +130,65 @@ onMounted(() => {
         <!-- 在馆人数和预约人数 -->
         <el-col :span="8">
           <div class="stats-block">
-            <h4>在馆人数</h4>
-            <p>当前在馆: {{ inLibCount }}</p>
-            <p>剩余入馆: {{ remainCount }}</p>
-            
-            <h4 style="margin-top: 20px;">预约人数</h4>
+            <el-tooltip class="box-item" effect="dark" placement="top-start">
+              <template #content>
+                实际刷卡进入图书馆的人数
+              </template>
+              <h4>在馆人数</h4>
+            </el-tooltip>
+            <p>当前在馆: {{ currentCount }}</p>
+            <p>剩余入馆: {{ remainingCount }}</p>
+
+            <el-tooltip class="box-item" effect="dark" placement="top-start">
+              <template #content>
+                当前已预约图书馆座位的人数
+              </template>
+              <h4 style="margin-top: 20px;">预约人数</h4>
+            </el-tooltip>
             <p>当前预约: {{ resvCount }}</p>
             <p>剩余可用: {{ freeCount }}</p>
           </div>
         </el-col>
-        
+
         <!-- 环形进度条 -->
         <el-col :span="4">
-          <el-progress
-            type="circle"
-            :percentage="inLibPercentage"
-            :width="80"
-          />
-          <el-progress
-            type="circle"
-            :percentage="resvPercentage"
-            :width="80"
-            style="margin-top: 20px;"
-          />
+          <el-progress type="circle" :percentage="inLibPercentage" :width="80" style="margin-top: 5px;" />
+          <el-progress type="circle" :percentage="resvPercentage" :width="80" style="margin-top: 20px;" />
         </el-col>
-        
+
         <!-- 各楼层座位预约率 -->
         <el-col :span="12">
           <h4>各楼层座位预约率</h4>
           <div class="floor-stats">
             <div class="floor-item">
               <span>2楼</span>
-              <el-progress 
-                :percentage="_2fPer" 
-                :status="_2fPer > 70 ? 'exception' : _2fPer > 50 ? 'warning' : 'success'"
-              />
+              <el-progress :percentage="_2fPer"
+                :status="_2fPer > 70 ? 'exception' : _2fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>3楼</span>
-              <el-progress 
-                :percentage="_3fPer" 
-                :status="_3fPer > 70 ? 'exception' : _3fPer > 50 ? 'warning' : 'success'"
-              />
+              <el-progress :percentage="_3fPer"
+                :status="_3fPer > 70 ? 'exception' : _3fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>4楼</span>
-              <el-progress 
-                :percentage="_4fPer" 
-                :status="_4fPer > 70 ? 'exception' : _4fPer > 50 ? 'warning' : 'success'"
-              />
+              <el-progress :percentage="_4fPer"
+                :status="_4fPer > 70 ? 'exception' : _4fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>5楼</span>
-              <el-progress 
-                :percentage="_5fPer" 
-                :status="_5fPer > 70 ? 'exception' : _5fPer > 50 ? 'warning' : 'success'"
-              />
+              <el-progress :percentage="_5fPer"
+                :status="_5fPer > 70 ? 'exception' : _5fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>6楼</span>
-              <el-progress 
-                :percentage="_6fPer" 
-                :status="_6fPer > 70 ? 'exception' : _6fPer > 50 ? 'warning' : 'success'"
-              />
+              <el-progress :percentage="_6fPer"
+                :status="_6fPer > 70 ? 'exception' : _6fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>7楼</span>
-              <el-progress 
-                :percentage="_7fPer" 
-                :status="_7fPer > 70 ? 'exception' : _7fPer > 50 ? 'warning' : 'success'"
-              />
+              <el-progress :percentage="_7fPer"
+                :status="_7fPer > 70 ? 'exception' : _7fPer > 50 ? 'warning' : 'success'" />
             </div>
           </div>
         </el-col>
@@ -225,7 +217,7 @@ onMounted(() => {
   margin-top: 5px;
 }
 
-.stats-card{
+.stats-card {
   margin-top: 50px;
 }
 

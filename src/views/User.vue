@@ -1,7 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue';
 import { ElMessage } from 'element-plus';
-import ReservationHistory from './ReservationHistory.vue';
 import { useUserStore } from '../stores/userStore';
 
 // 数据定义
