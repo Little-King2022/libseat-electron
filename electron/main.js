@@ -9,10 +9,11 @@ const {
   getResvByStuId,
   searchSeatByName,
   getSystemSetting,
-  updateSystemSetting
+  updateSystemSetting,
+  execSQL
 } = require('./services/dbService.js');
 
-const { updateSeatMenuDatabase } = require('./services/updateSeatMenuDatabaseService.js');
+const { updateSeatMenuDatabase, updateSeatCountDatabase } = require('./services/updateSeatMenuDatabaseService.js');
 
 // The built directory structure
 //
@@ -91,6 +92,14 @@ ipcMain.handle('open-pdf', async (event, pdfName) => {
 ipcMain.handle('update-seat-menu-database', async () => {
   return await updateSeatMenuDatabase();
 })
+
+ipcMain.handle('update-seat-count-database', async () => {
+  return await updateSeatCountDatabase();
+})
+
+ipcMain.handle('db:exec-sql', async (_event, sql, params) => {
+  return await execSQL(sql, params);
+});
 
 let win = null;
 

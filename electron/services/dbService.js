@@ -41,7 +41,7 @@ async function getSystemSetting() {
 
       const init_sql = 'INSERT INTO system (stu_id, stu_pwd, token, host_url, has_init, notify_type, id, user_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
       await db.run(init_sql, Object.values(defaultSettings));
-      
+
       // 递归调用获取新插入的设置
       return await getSystemSetting();
     }
@@ -66,7 +66,7 @@ async function updateSystemSetting(setting) {
     // 构建动态SQL语句和参数数组
     const updateFields = [];
     const values = [];
-    
+
     // 遍历setting对象的所有属性
     for (const [key, value] of Object.entries(setting)) {
       if (key !== 'id' && value !== undefined) { // 排除id字段,因为它是WHERE条件
@@ -82,7 +82,7 @@ async function updateSystemSetting(setting) {
 
     // 构建完整的SQL语句
     const sql = `UPDATE system SET ${updateFields.join(', ')} WHERE id = 1`;
-    
+
     await db.run(sql, values);
     return true;
   }
@@ -92,10 +92,16 @@ async function updateSystemSetting(setting) {
   }
 }
 
+async function execSQL(sql) {
+  const result = db.query(sql);
+  return result;
+}
+
 module.exports = {
   getAllAutoAppointments,
   getResvByStuId,
   searchSeatByName,
   getSystemSetting,
-  updateSystemSetting
+  updateSystemSetting,
+  execSQL
 };

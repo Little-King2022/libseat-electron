@@ -1,7 +1,7 @@
 {
   "name": "libseat-electron",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "LibSeat Electron Application",
   "author": "Little-King <littleking2024@gmail.com>",
   "scripts": {

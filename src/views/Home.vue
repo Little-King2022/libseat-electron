@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '../stores/userStore';
 import axios from 'axios'
 
 // 数据定义
@@ -40,15 +41,6 @@ const handleSeatInput = async () => {
   }
 }
 
-const handleStuInput = (value) => {
-  // 实现学生查询逻辑
-  if (value && value.length >= 2) {
-    // 模拟数据，实际应从API获取
-    stuList.value = ['张三 2020001', '李四 2020002']
-  } else {
-    stuList.value = []
-  }
-}
 
 const handleSeatSelect = (seat) => {
   // 处理座位选择
@@ -96,9 +88,78 @@ const getLibraryData = async () => {
   }
 }
 
+// 获取楼层数据
+const getFloorData = async () => {
+  if (!useUserStore().isLoggedIn) {
+    return;
+  }
+
+  try {
+    // 检查是否需要初始化数据库
+    if (useUserStore().systemSetting.has_init) {
+      const initResult = await window.api.invoke('update-seat-menu-database');
+      if (initResult.success) {
+        ElMessage.success('图书馆座位数据库初始化成功');
+        const settingResult = await window.api.invoke('db:update-system-setting', { has_init: 1 });
+        if (!settingResult.success) {
+          ElMessage.error('系统设置更新失败: ' + settingResult.message);
+        }
+      } else {
+        ElMessage.error('图书馆座位数据库初始化失败: ' + initResult.message);
+        return;
+      }
+    }
+
+    // 更新座位统计数据库
+    const updateResult = await window.api.invoke('update-seat-count-database');
+    if (!updateResult.success) {
+      ElMessage.error('图书馆座位统计数据库更新失败: ' + updateResult.message);
+      return;
+    }
+
+    // 从数据库读取楼层信息
+    const floorResult = await window.api.invoke('db:exec-sql', 'SELECT * FROM floor_info');
+    console.log(floorResult);
+
+    // 处理楼层数据，更新楼层百分比
+    floorResult.forEach(floor => {
+      // 假设数据结构中包含 floor_id 和 percentage 字段
+      switch (floor.floor_id) {
+        case '100455331':
+          _2fPer.value = parseInt((floor.total_count - floor.remain_count) / floor.total_count * 100);
+          break;
+        case '100455334':
+          _3fPer.value = parseInt((floor.total_count - floor.remain_count) / floor.total_count * 100);
+          break;
+        case '100455336':
+          _4fPer.value = parseInt((floor.total_count - floor.remain_count) / floor.total_count * 100);
+          break;
+        case '100455338':
+          _5fPer.value = parseInt((floor.total_count - floor.remain_count) / floor.total_count * 100);
+          break;
+        case '100455342':
+          _6fPer.value = parseInt((floor.total_count - floor.remain_count) / floor.total_count * 100);
+          break;
+        case '106657931':
+          _7fPer.value = parseInt((floor.total_count - floor.remain_count) / floor.total_count * 100);
+          break;
+      }
+    });
+
+    console.log('楼层百分比:', _2fPer.value, _3fPer.value, _4fPer.value, _5fPer.value, _6fPer.value, _7fPer.value);
+
+  } catch (error) {
+    console.error(error);
+    ElMessage.error('获取楼层数据失败: ' + error.message);
+    return [];
+  }
+};
+
+
 onMounted(() => {
   setTimeout(() => {
-    getLibraryData()
+    getLibraryData(),
+      getFloorData()
   }, 1000);
   setInterval(() => {
     getLibraryData()
@@ -142,7 +203,7 @@ onMounted(() => {
               <template #content>
                 实际刷卡进入图书馆的人数
               </template>
-              <h4>在馆人数</h4>
+              <h4 style="margin-top: 5px;">在馆人数</h4>
             </el-tooltip>
             <p>当前在馆: {{ currentCount }}</p>
             <p>剩余入馆: {{ remainingCount }}</p>
@@ -159,45 +220,45 @@ onMounted(() => {
         </el-col>
 
         <!-- 环形进度条 -->
-        <el-col :span="4">
+        <el-col :span="4" style="margin-top: 8px;">
           <el-progress type="circle" :percentage="inLibPercentage" :width="80" style="margin-top: 5px;" />
           <el-progress type="circle" :percentage="resvPercentage" :width="80" style="margin-top: 20px;" />
         </el-col>
 
         <!-- 各楼层座位预约率 -->
         <el-col :span="1"></el-col>
-        <el-col :span="8">
-          <h4>各楼层座位预约率</h4>
+        <el-col :span="10">
+          <h4 style="text-align: center;">各楼层座位预约率</h4>
           <div class="floor-stats">
             <div class="floor-item">
               <span>2楼</span>
-              <el-progress :percentage="_2fPer"
+              <el-progress :percentage="_2fPer" :text-inside="true" :stroke-width="14"
                 :status="_2fPer > 70 ? 'exception' : _2fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>3楼</span>
-              <el-progress :percentage="_3fPer"
+              <el-progress :percentage="_3fPer" :text-inside="true" :stroke-width="14"
                 :status="_3fPer > 70 ? 'exception' : _3fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>4楼</span>
-              <el-progress :percentage="_4fPer"
+              <el-progress :percentage="_4fPer" :text-inside="true" :stroke-width="14"
                 :status="_4fPer > 70 ? 'exception' : _4fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>5楼</span>
-              <el-progress :percentage="_5fPer"
+              <el-progress :percentage="_5fPer" :text-inside="true" :stroke-width="14"
                 :status="_5fPer > 70 ? 'exception' : _5fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>6楼</span>
-              <el-progress :percentage="_6fPer"
+              <el-progress :percentage="_6fPer" :text-inside="true" :stroke-width="14"
                 :status="_6fPer > 70 ? 'exception' : _6fPer > 50 ? 'warning' : 'success'" />
             </div>
             <div class="floor-item">
               <span>7楼</span>
-              <el-progress :percentage="_7fPer"
-                :status="_7fPer > 70 ? 'exception' : _7fPer > 50 ? 'warning' : 'success'" />
+              <el-progress :percentage="_7fPer" :text-inside="true" :stroke-width="14"
+              :status="_7fPer > 70 ? 'exception' : _6fPer > 50 ? 'warning' : 'success'" />
             </div>
           </div>
         </el-col>
@@ -254,11 +315,19 @@ onMounted(() => {
 .floor-item {
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .floor-item span {
   width: 40px;
   text-align: right;
   margin-right: 10px;
+  flex-shrink: 0; /* 防止文本被压缩 */
 }
+
+.floor-item .el-progress {
+  flex-grow: 1; /* 让进度条占据剩余空间 */
+  width: calc(100% - 50px); /* 减去span的宽度和margin */
+}
+
 </style>

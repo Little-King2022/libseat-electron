@@ -55,6 +55,57 @@ async function updateSeatMenuDatabase() {
     }
 }
 
+async function updateSeatCountDatabase() {
+    try {
+        const response = await axios.get(SEAT_MENU_URL);
+        const seatData = response.data;
+
+        if (seatData.code !== 0 || !Array.isArray(seatData.data)) {
+            throw new Error('无效的seatMenu响应数据');
+        }
+
+        const floors = seatData.data;
+
+        // 更新每个楼层的座位数量
+        for (const floor of floors) {
+            const { id: floor_id, remainCount, totalCount, children } = floor;
+
+            // 更新楼层座位数量
+            await dbService.run(
+                `UPDATE floor_info 
+                 SET remain_count = ?, total_count = ?
+                 WHERE floor_id = ?`,
+                [remainCount, totalCount, floor_id.toString()]
+            );
+
+            // 更新房间座位数量
+            for (const room of children || []) {
+                const { id: room_id, remainCount, totalCount } = room;
+
+                await dbService.run(
+                    `UPDATE room_info 
+                     SET remain_count = ?, total_count = ?
+                     WHERE room_id = ?`,
+                    [remainCount, totalCount, room_id.toString()]
+                );
+            }
+        }
+
+        console.log('座位数量更新完成');
+        return {
+            success: true,
+            message: '座位数量更新完成'
+        }
+    } catch (error) {
+        console.error('更新座位数量时发生错误：', error.message);
+        return {
+            success: false,
+            message: error.message
+        }
+    }
+}
+
 module.exports = {
-    updateSeatMenuDatabase
+    updateSeatMenuDatabase,
+    updateSeatCountDatabase
 };
