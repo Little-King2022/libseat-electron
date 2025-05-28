@@ -60,9 +60,16 @@ const updateDatabase = () => {
     window.api.invoke('update-seat-menu-database').then((res) => {
       updateDatabaseStatus.value = res.message;
       if (res.success) {
-        ElMessage.success('数据库更新成功');
+        window.api.invoke('update-seat-list-database').then(res => {
+          updateDatabaseStatus.value = res.message;
+          if (res.success) {
+            ElMessage.success('数据库更新成功');
+          } else {
+            ElMessage.error('座位数据库更新失败');
+          }
+        });
       } else {
-        ElMessage.error('数据库更新失败');
+        ElMessage.error('楼层数据库更新失败');
       }
     }).catch((err) => {
       ElMessage.error('数据库更新失败: ' + err.message);

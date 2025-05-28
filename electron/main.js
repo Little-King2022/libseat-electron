@@ -13,7 +13,7 @@ const {
   execSQL
 } = require('./services/dbService.js');
 
-const { updateSeatMenuDatabase, updateSeatCountDatabase } = require('./services/updateSeatMenuDatabaseService.js');
+const { updateSeatMenuDatabase, updateSeatCountDatabase, updateSeatListDatabase } = require('./services/updateSeatMenuDatabaseService.js');
 
 // The built directory structure
 //
@@ -95,6 +95,10 @@ ipcMain.handle('update-seat-menu-database', async () => {
 
 ipcMain.handle('update-seat-count-database', async () => {
   return await updateSeatCountDatabase();
+})
+
+ipcMain.handle('update-seat-list-database', async () => {
+  return await updateSeatListDatabase();
 })
 
 ipcMain.handle('db:exec-sql', async (_event, sql, params) => {
