@@ -15,7 +15,7 @@ async function getResvByStuId(stuId) {
 // 根据座位名模糊搜索（seat_list）
 async function searchSeatByName(name) {
   const clean = name.replace(/[^a-zA-Z0-9-]/g, '');
-  const sql = 'SELECT * FROM seat_list WHERE seat_name LIKE ? LIMIT 10';
+  const sql = 'SELECT * FROM seat_list WHERE seat_name LIKE ? ORDER BY seat_name LIMIT 10';
   return await db.query(sql, [`%${clean}%`]);
 }
 

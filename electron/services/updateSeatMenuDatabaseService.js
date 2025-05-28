@@ -119,11 +119,14 @@ async function updateSeatListDatabase() {
         const settings = await dbService.getSystemSetting();
         const token = settings.token;
 
-        roomList.forEach(async room_id => {
-            console.log('正在更新房间ID为', room_id.room_id, '的座位列表');
+        // 清空原有数据
+        await sqlite.run('DELETE FROM seat_list');
+
+        roomList.forEach(async room => {
+            console.log('正在更新房间ID为', room.room_id, '的座位列表');
             const response = await axios.get(SEAT_LIST_URL, {
                 params: {
-                    roomIds: room_id.room_id,
+                    roomIds: room.room_id,
                     resvDates: new Date().toISOString().split('T')[0].replace(/-/g, ''), //获取当前日期 eg:20250527
                     sysKind: 8
                 },
@@ -134,7 +137,7 @@ async function updateSeatListDatabase() {
                 }
             });
             const seatData = response.data;
-            console.log('获取到的座位列表数据：', seatData);
+            // console.log('获取到的座位列表数据：', seatData);
 
             if (seatData.code !== 0 || !Array.isArray(seatData.data)) {
                 throw new Error('无效的seatList响应数据');
@@ -144,6 +147,7 @@ async function updateSeatListDatabase() {
 
             // 更新每个房间的座位状态
             for (const seat of seats) {
+                // console.log(seat);
                 const {
                     devId: seat_id,
                     devName: seat_name,
@@ -154,12 +158,16 @@ async function updateSeatListDatabase() {
                 } = seat;
 
                 await sqlite.run(
-                    `INSERT INTO seat_list(seat_id, seat_name, room_id, room_name, floor_id, floor_name) VALUES (?, ?, ?, ?, ?, ?)`,
-                    [seat_id.toString(), seat_name, room_id.room_id.toString(), room_name, floor_id.toString(), floor_name]
+                    `INSERT INTO seat_list(seat_id, seat_name, room_id, room_name, floor_id, floor_name) VALUES (?, ?, ?, ?, ?, ?);`,
+                    [seat_id.toString(), seat_name, room.room_id.toString(), room_name, floor_id.toString(), floor_name]
                 );
 
             }
         });
+        return {
+            success: true,
+            message: '座位列表更新完成'
+        }
 
     } catch (error) {
         console.error('更新座位列表时发生错误：', error.message);

@@ -1,11 +1,12 @@
-# LibSeat 图书馆座位预约系统
+# LibSeat 图书馆座位预约桌面应用
 
 LibSeat 是一个基于 Electron 和 Vue.js 开发的跨平台图书馆座位预约桌面应用程序。它提供了便捷的座位预约管理功能，帮助学生更好地使用图书馆资源。
 
 ## 主要功能
 
-- 🔍 **座位查询 (Developing)**：快速查询座位状态和使用情况
-- 📊 **实时统计 (Developing)**：显示图书馆各楼层座位使用率、在馆人数等统计信息
+- 🔍 **座位查询**：快速查询座位状态和使用情况
+- 📅 **一键预约 (Developing)**：支持一键预约图书馆座位
+- 📊 **实时统计**：显示图书馆各楼层座位使用率、在馆人数等统计信息
 ![image](https://github.com/user-attachments/assets/3bb6c0ed-318a-40d7-b428-bddded330ce7)
 
 - 📅 **自动预约 (Developing)**：支持设置自动预约任务，每天自动为用户预约指定座位
@@ -18,10 +19,11 @@ LibSeat 是一个基于 Electron 和 Vue.js 开发的跨平台图书馆座位预
 - 🗺️ **座位分布**：提供图书馆座位分布图的查看功能
 ![image](https://github.com/user-attachments/assets/14cf0686-460f-4056-ba05-cdac95ad817c)
 
-- ⚙️ **个人中心**：登录、查看账户信息
+- 👤 **个人中心**：登录、查看账户信息
 ![image](https://github.com/user-attachments/assets/27390e26-9a5b-4198-9507-ad403800ba60)
 ![image](https://github.com/user-attachments/assets/2e17ca56-53a6-43bd-aab1-3af5029751c1)
 
+- ⚙️ **系统设置**：自定义主题、更新图书馆楼层信息、座位列表数据库
 
 ## 技术栈
 

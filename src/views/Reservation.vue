@@ -20,16 +20,18 @@ const user = ref({
   resv_start_time: '8:00'
 })
 
-// 方法定义
-const handleResvSeatInput = (value) => {
-  // 实现座位查询逻辑
-  if (value && value.length >= 3) {
-    // 模拟数据，实际应从API获取
-    resvSeatList.value = [
-      { seat_id: '1001', seat_name: 'A101' },
-      { seat_id: '1002', seat_name: 'A102' },
-      { seat_id: '1003', seat_name: 'A103' }
-    ]
+// 座位号查询输入
+const handleResvSeatInput = async () => {
+  if (resvSeatInput.value && resvSeatInput.value.length >= 1) {
+    try {
+      const result = await window.api.invoke('db:search-seat-by-name', resvSeatInput.value)
+      console.log('查询结果:', result)
+      resvSeatList.value = result.map(seat => ({ seat }))
+    } catch (error) {
+      console.error('查询座位信息失败:', error)
+      ElMessage.error('查询失败，请检查本地数据库连接')
+      resvSeatList.value = []
+    }
   } else {
     resvSeatList.value = []
   }
@@ -37,13 +39,19 @@ const handleResvSeatInput = (value) => {
 
 const handleResvSeatSelect = (seat) => {
   // 添加到预选列表
-  if (!resvSeatIdList.value.includes(seat.seat_id)) {
-    resvSeatIdList.value.push(seat.seat_id)
-    resvSeatNameList.value.push(seat.seat_name)
+  console.log('选择的座位:', seat)
+  if (!resvSeatIdList.value.includes(seat.seat.seat_id)) {
+    // 检查长度不允许超过5个
+    if (resvSeatIdList.value.length >= 5) {
+      ElMessage.warning('预选座位列表已满，请先删除一些座位')
+      return
+    }
+    resvSeatIdList.value.push(seat.seat.seat_id)
+    resvSeatNameList.value.push(seat.seat.seat_name)
     showResvSelectList.value = true
-    ElMessage.success(`已添加座位 ${seat.seat_name} 到预选列表`)
+    ElMessage.success(`已添加座位 ${seat.seat.seat_name} 到预选列表`)
   } else {
-    ElMessage.warning(`座位 ${seat.seat_name} 已在预选列表中`)
+    ElMessage.warning(`座位 ${seat.seat.seat_name} 已在预选列表中`)
   }
 }
 
@@ -51,7 +59,7 @@ const clearResvSeatList = () => {
   resvSeatIdList.value = []
   resvSeatNameList.value = []
   showResvSelectList.value = false
-  ElMessage.success('已清空预选座位列表')
+  ElMessage.success('清空成功')
 }
 
 const submitResvList = () => {
@@ -59,7 +67,7 @@ const submitResvList = () => {
     ElMessage.warning('请先添加预选座位')
     return
   }
-  
+
   // 模拟提交成功
   ElMessage.success('预约任务提交成功')
   // 获取当前预约任务详情
@@ -113,46 +121,32 @@ onMounted(() => {
           <span class="subtitle">在此选取座位后，每天将自动预约</span>
         </div>
       </template>
-      
+
       <!-- 座位预选列表 -->
-      <el-alert
-        v-if="showResvSelectList"
-        title="座位预选列表"
-        type="info"
-        :closable="false"
-        show-icon
-      >
-        <div>{{ resvSeatNameList.join(', ') }}</div>
+      <el-alert v-if="showResvSelectList" title="座位预选列表（预约优先级: 从左到右）" type="info" :closable="false" show-icon>
+        <div style="color: rgba(2, 0, 255, 0.95);font-size: 18px;">{{ resvSeatNameList.join(', ') }}</div>
+        <div style="color: rgba(255, 0, 0, 0.508);font-size: 10px;">自动预约优先级: 从左到右依次尝试</div>
         <el-button @click="clearResvSeatList" size="small" type="danger" style="margin-top: 10px;">
           清空预选座位列表
         </el-button>
       </el-alert>
-      
+
       <!-- 座位搜索 -->
-      <el-input
-        v-model="resvSeatInput"
-        placeholder="请输入后三位数字"
-        clearable
-        @change="handleResvSeatInput"
-        style="margin-top: 15px;"
-      >
+      <el-input v-model="resvSeatInput" placeholder="请输入后三位数字" clearable @input="handleResvSeatInput"
+        style="margin-top: 15px;">
         <template #prepend>座位编号:</template>
       </el-input>
-      
+
       <!-- 搜索结果 -->
-      <el-table
-        v-if="resvSeatList.length > 0"
-        :data="resvSeatList"
-        style="width: 100%; margin-top: 20px;"
-      >
-        <el-table-column prop="seat_name" label="座位号" />
+      <el-table v-if="resvSeatList.length > 0" :data="resvSeatList" style="width: 100%; margin-top: 20px;">
+        <el-table-column prop="seat.seat_name" label="座位号" />
         <el-table-column label="操作">
           <template #default="scope">
             <el-button @click="handleResvSeatSelect(scope.row)" type="primary" size="small">添加预选</el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <el-button @click="submitResvList" type="primary" plain>提交预约任务</el-button>
@@ -169,7 +163,7 @@ onMounted(() => {
           <span class="subtitle">此处显示正在执行的预约任务</span>
         </div>
       </template>
-      
+
       <el-descriptions :column="1" border>
         <el-descriptions-item label="预约账户">{{ taskStuId }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ taskCreateTime }}</el-descriptions-item>
@@ -182,16 +176,16 @@ onMounted(() => {
           </template>
         </el-descriptions-item>
       </el-descriptions>
-      
+
       <div class="task-details">
         <h4>预选座位列表</h4>
         <div class="seat-list">{{ taskSeatNameList }}</div>
-        
+
         <template v-if="lastResvResult">
           <h4>任务执行结果</h4>
           <div v-html="lastResvResult" class="result-content"></div>
         </template>
-        
+
         <template v-if="lastResvLog">
           <h4>任务执行日志</h4>
           <div v-html="lastResvLog" class="log-content"></div>
@@ -242,7 +236,8 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.result-content, .log-content {
+.result-content,
+.log-content {
   background-color: #f8f8f8;
   padding: 10px;
   border-radius: 4px;

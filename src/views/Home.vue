@@ -24,11 +24,11 @@ const _5fPer = ref(0)
 const _6fPer = ref(0)
 const _7fPer = ref(0)
 
-// 方法定义
+// 座位号查询输入
 const handleSeatInput = async () => {
-  if (seatNumber.value && seatNumber.value.length >= 3) {
+  if (seatNumber.value && seatNumber.value.length >= 1) {
     try {
-      const result = await window.api.searchSeatByName(seatNumber.value)
+      const result = await window.api.invoke('db:search-seat-by-name', seatNumber.value)
       console.log('查询结果:', result)
       seatList.value = result.map(seat => ({ seat }))
     } catch (error) {
@@ -41,16 +41,15 @@ const handleSeatInput = async () => {
   }
 }
 
-
+// 选择座位
 const handleSeatSelect = (seat) => {
   // 处理座位选择
   console.log('选择座位:', seat.seat.seat_name)
   ElMessage.info(`你选择了座位：${seat.seat.seat_name}`)
-}
+  // TODO
 
-const handleStuSelect = (student) => {
-  // 处理学生选择
-  console.log('选择学生:', student)
+
+
 }
 
 // 获取图书馆数据
@@ -174,7 +173,7 @@ onMounted(() => {
       <template #header>
         <div class="card-header">
           <h3>座位查询</h3>
-          <span class="subtitle">座位签到、查询座位使用记录、当前使用者</span>
+          <span class="subtitle">一键预约、查询座位当前预约信息</span>
         </div>
       </template>
       <el-input v-model="seatNumber" placeholder="请输入后三位数字" clearable @input="handleSeatInput">
@@ -186,6 +185,7 @@ onMounted(() => {
         <el-table-column label="操作">
           <template #default="scope">
             <el-button @click="handleSeatSelect(scope.row)" type="primary" size="small">查询</el-button>
+            <el-button @click="handleSeatResv(scope.row)" type="primary" size="small">一键预约</el-button>
           </template>
         </el-table-column>
       </el-table>

@@ -57,12 +57,15 @@ const updateDatabase = () => {
   })
 
   setTimeout(() => {
+    updateDatabaseStatus.value = '正在更新楼层列表...';
     window.api.invoke('update-seat-menu-database').then((res) => {
       updateDatabaseStatus.value = res.message;
       if (res.success) {
+        updateDatabaseStatus.value = '正在更新座位列表...';
         window.api.invoke('update-seat-list-database').then(res => {
           updateDatabaseStatus.value = res.message;
           if (res.success) {
+            updateDatabaseStatus.value = '座位列表更新成功';
             ElMessage.success('数据库更新成功');
           } else {
             ElMessage.error('座位数据库更新失败');
@@ -72,9 +75,10 @@ const updateDatabase = () => {
         ElMessage.error('楼层数据库更新失败');
       }
     }).catch((err) => {
+      updateDatabaseStatus.value = '数据库更新失败: ' + err.message;
       ElMessage.error('数据库更新失败: ' + err.message);
     });
-  }, 1000);
+  }, 500);
 
 }
 </script>
