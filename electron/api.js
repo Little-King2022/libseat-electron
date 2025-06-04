@@ -46,7 +46,7 @@ function startApiServer() {
         const match1 = html.match(regex1);
         const regex2 = /<span\s+style="color:red;font-size:150px">(\d+)<\/span>/;
         const match2 = html.match(regex2);
-        if (match1 && match1) {
+        if (match1 && match2) {
           libraryData.currentCount = match1[1];
           libraryData.remainingCount = match2[1];
         } else {
