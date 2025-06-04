@@ -258,7 +258,7 @@ onMounted(() => {
             <div class="floor-item">
               <span>7楼</span>
               <el-progress :percentage="_7fPer" :text-inside="true" :stroke-width="14"
-              :status="_7fPer > 70 ? 'exception' : _6fPer > 50 ? 'warning' : 'success'" />
+                :status="_7fPer > 70 ? 'exception' : _7fPer > 50 ? 'warning' : 'success'" />
             </div>
           </div>
         </el-col>
