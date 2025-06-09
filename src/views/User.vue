@@ -6,6 +6,7 @@ import { useUserStore } from '../stores/userStore';
 // 数据定义
 const systemSetting = ref({})
 const userStore = useUserStore();
+const version = ref('')
 
 // 登录表单
 const loginForm = reactive({
@@ -31,7 +32,7 @@ const logout = () => {
 };
 
 
-onMounted(() => {
+onMounted(async () => {
   // 获取系统设置
   window.api.invoke('db:get-system-setting').then(result => {
     console.log('系统设置:', result)
@@ -42,6 +43,7 @@ onMounted(() => {
     console.error('获取系统设置失败:', error)
     ElMessage.error('获取系统设置失败')
   })
+  version.value = await window.api.invoke('get-app-version')
 });
 
 // 监听 systemSetting 变化，更新 loginForm
@@ -67,7 +69,12 @@ watch(() => systemSetting.value, (newVal) => {
           </template>
           <template v-else>
             <el-tag v-if="userStore.userInfo.logonName" type="success">学生身份已认证</el-tag>
+            <div style="display: inline;padding-left: 10px;">
+              <el-tag v-if="userStore.userInfo.credit < 200" type="warning">信用分不足，请注意保持哦</el-tag>
+              <el-tag v-if="userStore.userInfo.credit < 100" type="danger">信用分不足，无法预约座位哦</el-tag>
+            </div>
             <div v-if="userStore.userInfo.logonName">{{ userStore.userInfo.logonName + ' ' + userStore.userInfo.trueName }}</div>
+            
           </template>
         </div>
       </div>
@@ -117,7 +124,7 @@ watch(() => systemSetting.value, (newVal) => {
       </template>
     </el-card>
     <div class="version-info">
-      <p>Version: 1.0.0</p>
+      <p>Version: {{ version }}</p>
       <p>苏ICP备2023036460号-1X</p>
     </div>
   </div>

@@ -109,8 +109,33 @@ function stopAutoRefresh() {
     }
 }
 
+async function getUserCredit() {
+    const setting = await getSystemSetting();
+    const cookie = setting.token;
+    return axios.get('https://libseat.njfu.edu.cn/ic-web/creditPunishRec/surPlus', {
+        headers: {
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "zh-CN,zh;q=0.9",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Host": "libseat.njfu.edu.cn",
+            "Pragma": "no-cache",
+            "Referer": "https://libseat.njfu.edu.cn/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+            "Cookie": cookie,
+        }
+    }).then(res => {
+        if (res.data.code !== 0) {
+            throw new Error(res.data.message || '获取用户信用分失败');
+        }
+        return res.data.data;   
+    })
+}
+
 module.exports = {
     doLogin,
     startAutoRefresh,
     stopAutoRefresh,
+    getUserCredit
 };

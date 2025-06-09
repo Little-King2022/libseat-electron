@@ -37,6 +37,8 @@ export const useUserStore = defineStore('user', {
               ElMessage.success('自动登录成功')
               // 开启自动更新
               await window.api.invoke('start-auto-refresh')
+              // 获取用户积分
+              await this.getUserCredit()
             }
           } finally {
             loading.close()
@@ -70,6 +72,8 @@ export const useUserStore = defineStore('user', {
           this.userInfo = { ...this.userInfo, ...loginResult.data }
           // 开启自动更新
           await window.api.invoke('start-auto-refresh')
+          // 获取用户积分
+          await this.getUserCredit()
           return true
         } else {
           ElMessage.error(loginResult.message || '登录失败')
@@ -108,6 +112,12 @@ export const useUserStore = defineStore('user', {
         console.error('停止自动更新失败:', error)
         ElMessage.error('注销过程出现错误')
       }
+    },
+
+    async getUserCredit() {
+      const credit = await window.api.invoke('get-user-credit')
+      console.log('credit', credit)
+      this.userInfo.credit = credit[8]
     }
   },
 

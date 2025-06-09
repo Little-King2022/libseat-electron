@@ -3,7 +3,7 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('node:path');
 const { startApiServer } = require('./api');
 
-const { doLogin, startAutoRefresh, stopAutoRefresh } = require('./services/loginManager.js');
+const { doLogin, startAutoRefresh, stopAutoRefresh, getUserCredit } = require('./services/loginManager.js');
 const {
   getAllAutoAppointments,
   getResvByStuId,
@@ -104,6 +104,14 @@ ipcMain.handle('update-seat-list-database', async () => {
 ipcMain.handle('db:exec-sql', async (_event, sql, params) => {
   return await execSQL(sql, params);
 });
+
+ipcMain.handle('get-user-credit', async () => {
+  return await getUserCredit();
+})
+
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion()
+})
 
 let win = null;
 

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '../stores/userStore';
 
 // 数据定义
 const resvSeatInput = ref('')
@@ -8,6 +9,7 @@ const resvSeatList = ref([])
 const showResvSelectList = ref(false)
 const resvSeatNameList = ref([])
 const resvSeatIdList = ref([])
+const userStore = useUserStore();
 
 // 当前预约任务数据
 const showNowResvDetail = ref(false)
@@ -117,7 +119,8 @@ onMounted(() => {
     <el-card class="resv-card">
       <template #header>
         <div class="card-header">
-          <h3>新增预约任务</h3>
+          <el-tag v-if="userStore.userInfo.credit < 100" type="danger">信用分不足，无法预约座位哦</el-tag>
+          <h3 style="padding-top: 5px">新增预约任务</h3>
           <span class="subtitle">在此选取座位后，每天将自动预约</span>
         </div>
       </template>
@@ -125,7 +128,6 @@ onMounted(() => {
       <!-- 座位预选列表 -->
       <el-alert v-if="showResvSelectList" title="座位预选列表（预约优先级: 从左到右）" type="info" :closable="false" show-icon>
         <div style="color: rgba(2, 0, 255, 0.95);font-size: 18px;">{{ resvSeatNameList.join(', ') }}</div>
-        <div style="color: rgba(255, 0, 0, 0.508);font-size: 10px;">自动预约优先级: 从左到右依次尝试</div>
         <el-button @click="clearResvSeatList" size="small" type="danger" style="margin-top: 10px;">
           清空预选座位列表
         </el-button>
@@ -165,7 +167,7 @@ onMounted(() => {
       </template>
 
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="预约账户">{{ taskStuId }}</el-descriptions-item>
+        <el-descriptions-item label="预约账户">{{ userStore.userInfo.logonName + ' ' + userStore.userInfo.trueName }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ taskCreateTime }}</el-descriptions-item>
         <el-descriptions-item label="预约时段">
           <template v-if="user.resv_start_time">
@@ -175,11 +177,10 @@ onMounted(() => {
             <span style="color: rgba(255, 0, 0, 0.808);">未设置，默认为8:00～22:00（周五20:00结束）</span>
           </template>
         </el-descriptions-item>
+        <el-descriptions-item label="预选座位列表">{{ taskSeatNameList }}</el-descriptions-item>
       </el-descriptions>
 
       <div class="task-details">
-        <h4>预选座位列表</h4>
-        <div class="seat-list">{{ taskSeatNameList }}</div>
 
         <template v-if="lastResvResult">
           <h4>任务执行结果</h4>
