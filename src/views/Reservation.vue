@@ -60,8 +60,8 @@ const handleResvSeatSelect = (seat) => {
 const clearResvSeatList = () => {
   resvSeatIdList.value = []
   resvSeatNameList.value = []
+  resvSeatList.value = []
   showResvSelectList.value = false
-  ElMessage.success('清空成功')
 }
 
 const submitResvList = async () => {
@@ -71,14 +71,21 @@ const submitResvList = async () => {
   }
 
   const task = {
-    stuId: userStore.userInfo.logonName || userStore.userInfo.stu_id,
-    seatIds: resvSeatIdList.value,
-    seatNames: resvSeatNameList.value,
-    startTime: user.value.resv_start_time,
-    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
+    stuId: userStore.userInfo.logonName,
+    stuName: userStore.userInfo.trueName,
+    stuPwd: userStore.systemSetting.stu_pwd,
+    cookie: userStore.systemSetting.token,
+    userData: userStore.systemSetting.user_data,
+    seatList: resvSeatIdList.value.map((seatId, index) => ({
+      id: seatId.toString(),
+      name: resvSeatNameList.value[index].toString()
+    })),
+    startTime: user.value.resv_start_time || '8:00',
+    createdAt: new Date().toLocaleString('zh-CN', { hour12: false }),
     result: ''
   }
 
+  console.log('提交的预约任务:', task)
   const res = await window.api.invoke('task:save', task)
   if (res.success) {
     ElMessage.success('预约任务提交成功')
@@ -116,7 +123,7 @@ const getNowResvDetail = async () => {
     showNowResvDetail.value = true
     taskStuId.value = res.data.stuId
     taskCreateTime.value = res.data.createdAt
-    taskSeatNameList.value = res.data.seatNames.join(', ')
+    taskSeatNameList.value = res.data.seatList.map(seat => seat.name).join(', ')
     lastResvResult.value = res.data.result || ''
     lastResvLog.value = res.log ? res.log.replace(/\n/g, '<br/>') : ''
   } else {

@@ -24,13 +24,15 @@ function deleteTask() {
 }
 
 function appendLog(content) {
-  const line = `[${new Date().toISOString()}] ${content}\n`;
+  const line = `[${new Date().toLocaleString('zh-CN', { hour12: false })}] ${content}\n`;
   fs.appendFileSync(LOG_FILE, line, 'utf-8');
 }
 
 function readLog() {
   if (fs.existsSync(LOG_FILE)) {
-    return fs.readFileSync(LOG_FILE, 'utf-8');
+    const logContent = fs.readFileSync(LOG_FILE, 'utf-8');
+    const logLines = logContent.split('\n').reverse().slice(1, 50);
+    return logLines.join('\n');
   }
   return '';
 }
