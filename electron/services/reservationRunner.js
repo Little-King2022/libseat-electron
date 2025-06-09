@@ -124,11 +124,9 @@ async function keepCookieAlive(cookie) {
       appendLog('cookie 保活成功');
     } else {
       appendLog('cookie 保活失败');
-      process.exit(1);
     }
   } catch (err) {
     appendLog(`cookie 保活异常: ${err.message}`);
-    process.exit(1);
   }
 }
 
