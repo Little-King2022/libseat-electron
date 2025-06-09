@@ -27,7 +27,7 @@
 <script setup>
 import { reactive, ref, watch, h } from 'vue';
 import { getTheme, setTheme, applyTheme } from '../utils/theme';
-import { ElNotification, ElMessage } from 'element-plus';
+import { ElNotification, ElMessage, ElLoading } from 'element-plus';
 import { useUserStore } from '../stores/userStore';
 
 const settings = reactive({
@@ -56,6 +56,12 @@ const updateDatabase = () => {
     duration: 10000,
   })
 
+  const loading = ElLoading.service({
+    lock: true,
+    text: '正在更新图书馆数据库，请耐心等待...',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+
   setTimeout(() => {
     updateDatabaseStatus.value = '正在更新楼层列表...';
     window.api.invoke('update-seat-menu-database').then((res) => {
@@ -70,13 +76,16 @@ const updateDatabase = () => {
           } else {
             ElMessage.error('座位数据库更新失败');
           }
+          loading.close();
         });
       } else {
         ElMessage.error('楼层数据库更新失败');
+        loading.close();
       }
     }).catch((err) => {
       updateDatabaseStatus.value = '数据库更新失败: ' + err.message;
       ElMessage.error('数据库更新失败: ' + err.message);
+      loading.close();
     });
   }, 500);
 

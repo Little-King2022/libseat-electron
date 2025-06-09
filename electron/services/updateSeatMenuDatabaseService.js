@@ -122,7 +122,7 @@ async function updateSeatListDatabase() {
         // 清空原有数据
         await sqlite.run('DELETE FROM seat_list');
 
-        roomList.forEach(async room => {
+        for (const room of roomList) {
             console.log('正在更新房间ID为', room.room_id, '的座位列表');
             const response = await axios.get(SEAT_LIST_URL, {
                 params: {
@@ -137,17 +137,17 @@ async function updateSeatListDatabase() {
                 }
             });
             const seatData = response.data;
-            // console.log('获取到的座位列表数据：', seatData);
 
             if (seatData.code !== 0 || !Array.isArray(seatData.data)) {
                 throw new Error('无效的seatList响应数据');
             }
 
             const seats = seatData.data;
+            const batchValues = [];
+            const batchParams = [];
 
-            // 更新每个房间的座位状态
+            // 收集所有座位数据
             for (const seat of seats) {
-                // console.log(seat);
                 const {
                     devId: seat_id,
                     devName: seat_name,
@@ -156,14 +156,27 @@ async function updateSeatListDatabase() {
                     labId: floor_id,
                     labName: floor_name,
                 } = seat;
-
-                await sqlite.run(
-                    `INSERT INTO seat_list(seat_id, seat_name, room_id, room_name, floor_id, floor_name) VALUES (?, ?, ?, ?, ?, ?);`,
-                    [seat_id.toString(), seat_name, room.room_id.toString(), room_name, floor_id.toString(), floor_name]
+                
+                batchValues.push('(?, ?, ?, ?, ?, ?)');
+                batchParams.push(
+                    seat_id.toString(), 
+                    seat_name, 
+                    room.room_id.toString(), 
+                    room_name, 
+                    floor_id.toString(), 
+                    floor_name
                 );
-
             }
-        });
+            
+            // 批量插入当前房间的所有座位
+            if (batchValues.length > 0) {
+                const query = `INSERT INTO seat_list(seat_id, seat_name, room_id, room_name, floor_id, floor_name) VALUES ${batchValues.join(', ')}`;
+                await sqlite.run(query, batchParams);
+            }
+        }
+        
+        // 更新has_init为true
+        await sqlite.run('UPDATE system SET has_init = 1');
         return {
             success: true,
             message: '座位列表更新完成'
@@ -177,6 +190,7 @@ async function updateSeatListDatabase() {
         }
     }
 }
+
 
 module.exports = {
     updateSeatMenuDatabase,

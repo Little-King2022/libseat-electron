@@ -95,12 +95,13 @@ const getFloorData = async () => {
 
   try {
     // 检查是否需要初始化数据库
-    if (useUserStore().systemSetting.has_init) {
+    if (!useUserStore().systemSetting.has_init) {
       const initResult = await window.api.invoke('update-seat-menu-database');
       if (initResult.success) {
         ElMessage.success('图书馆座位数据库初始化成功');
         const settingResult = await window.api.invoke('db:update-system-setting', { has_init: 1 });
-        if (!settingResult.success) {
+        console.log("settingResult", settingResult);
+        if (!settingResult) {
           ElMessage.error('系统设置更新失败: ' + settingResult.message);
         }
       } else {

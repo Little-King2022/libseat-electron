@@ -31,7 +31,7 @@ if (!fs.existsSync(userDbPath)) {
 }
 
 // 创建数据库连接
-const db = new Database(userDbPath, { verbose: console.log });
+const db = new Database(userDbPath);
 
 /**
  * 执行查询并返回所有结果行

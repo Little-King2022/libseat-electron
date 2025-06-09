@@ -47,13 +47,18 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 定义需要登录才能访问的路由
   const requiresAuth = ['/home', '/reservation', '/reservation-history'];
-  
-  
+
+
   // 如果路由需要认证且用户未登录
   if (requiresAuth.includes(to.path) && !useUserStore().isLoggedIn) {
     ElMessage.warning('请先登录');
     next('/user');
-  } else {
+  }
+  else if (requiresAuth.includes(to.path) && useUserStore().isLoggedIn && !useUserStore().systemSetting.has_init) {
+    ElMessage.warning('请先初始化系统数据库');
+    next('/system-setting');
+  }
+  else {
     next();
   }
 });
