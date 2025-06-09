@@ -64,22 +64,39 @@ const clearResvSeatList = () => {
   ElMessage.success('清空成功')
 }
 
-const submitResvList = () => {
+const submitResvList = async () => {
   if (resvSeatIdList.value.length === 0) {
     ElMessage.warning('请先添加预选座位')
     return
   }
 
-  // 模拟提交成功
-  ElMessage.success('预约任务提交成功')
-  // 获取当前预约任务详情
-  getNowResvDetail()
+  const task = {
+    stuId: userStore.userInfo.logonName || userStore.userInfo.stu_id,
+    seatIds: resvSeatIdList.value,
+    seatNames: resvSeatNameList.value,
+    startTime: user.value.resv_start_time,
+    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
+    result: ''
+  }
+
+  const res = await window.api.invoke('task:save', task)
+  if (res.success) {
+    ElMessage.success('预约任务提交成功')
+    clearResvSeatList()
+    await getNowResvDetail()
+  } else {
+    ElMessage.error('任务保存失败: ' + res.message)
+  }
 }
 
-const deleteResvList = () => {
-  // 模拟删除成功
-  ElMessage.success('预约任务删除成功')
-  showNowResvDetail.value = false
+const deleteResvList = async () => {
+  const res = await window.api.invoke('task:delete')
+  if (res.success) {
+    ElMessage.success('预约任务删除成功')
+    showNowResvDetail.value = false
+  } else {
+    ElMessage.error('删除失败: ' + res.message)
+  }
 }
 
 const showSeatPDF = async () => {
@@ -93,23 +110,22 @@ const showSeatPDF = async () => {
   }
 }
 
-const getNowResvDetail = () => {
-  // 模拟获取当前预约任务详情
-  showNowResvDetail.value = true
-  taskStuId.value = '2020001'
-  taskCreateTime.value = '2023-06-01 10:00:00'
-  taskSeatNameList.value = resvSeatNameList.value.join(', ')
-  lastResvResult.value = '<p style="color:green">预约成功: A101</p>'
-  lastResvLog.value = '<p>2023-06-01 08:00:00 开始执行预约任务</p><p>2023-06-01 08:00:05 尝试预约座位 A101</p><p>2023-06-01 08:00:10 预约成功</p>'
+const getNowResvDetail = async () => {
+  const res = await window.api.invoke('task:load')
+  if (res.success && res.data) {
+    showNowResvDetail.value = true
+    taskStuId.value = res.data.stuId
+    taskCreateTime.value = res.data.createdAt
+    taskSeatNameList.value = res.data.seatNames.join(', ')
+    lastResvResult.value = res.data.result || ''
+    lastResvLog.value = res.log ? res.log.replace(/\n/g, '<br/>') : ''
+  } else {
+    showNowResvDetail.value = false
+  }
 }
 
 onMounted(() => {
-  // 检查是否有现有预约任务
-  // 模拟数据，实际应从API获取
-  const hasExistingTask = false
-  if (hasExistingTask) {
-    getNowResvDetail()
-  }
+  getNowResvDetail()
 })
 </script>
 

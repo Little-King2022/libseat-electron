@@ -14,6 +14,7 @@ const {
 } = require('./services/dbService.js');
 
 const { updateSeatMenuDatabase, updateSeatCountDatabase, updateSeatListDatabase } = require('./services/updateSeatMenuDatabaseService.js');
+const taskService = require('./services/taskService.js');
 
 // The built directory structure
 //
@@ -111,6 +112,39 @@ ipcMain.handle('get-user-credit', async () => {
 
 ipcMain.handle('get-app-version', () => {
   return app.getVersion()
+})
+
+ipcMain.handle('task:save', (_event, task) => {
+  try {
+    taskService.saveTask(task)
+    taskService.appendLog('创建预约任务')
+    return { success: true }
+  } catch (err) {
+    console.error('save task error:', err)
+    return { success: false, message: err.message }
+  }
+})
+
+ipcMain.handle('task:load', () => {
+  try {
+    const data = taskService.loadTask()
+    const log = taskService.readLog()
+    return { success: true, data, log }
+  } catch (err) {
+    console.error('load task error:', err)
+    return { success: false, message: err.message }
+  }
+})
+
+ipcMain.handle('task:delete', () => {
+  try {
+    taskService.deleteTask()
+    taskService.appendLog('删除预约任务')
+    return { success: true }
+  } catch (err) {
+    console.error('delete task error:', err)
+    return { success: false, message: err.message }
+  }
 })
 
 let win = null;
