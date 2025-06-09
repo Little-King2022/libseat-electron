@@ -147,6 +147,15 @@ ipcMain.handle('task:delete', () => {
   }
 })
 
+ipcMain.handle('task:is-running', () => {
+  try {
+    return taskService.isTaskRunning()
+  } catch (err) {
+    console.error('check task status error:', err)
+    return false
+  }
+})
+
 let win = null;
 
 function createWindow() {

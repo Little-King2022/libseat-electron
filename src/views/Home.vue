@@ -23,6 +23,11 @@ const _4fPer = ref(0)
 const _5fPer = ref(0)
 const _6fPer = ref(0)
 const _7fPer = ref(0)
+const reservationRunning = ref(false)
+
+const checkTaskStatus = async () => {
+  reservationRunning.value = await window.api.invoke('task:is-running')
+}
 
 // 座位号查询输入
 const handleSeatInput = async () => {
@@ -164,11 +169,19 @@ onMounted(() => {
   setInterval(() => {
     getLibraryData()
   }, 60000)
+  checkTaskStatus()
+  setInterval(checkTaskStatus, 30000)
 })
 </script>
 
 <template>
   <div class="home-container">
+    <el-alert
+      :title="reservationRunning ? '自动预约程序运行中' : '自动预约程序未运行'"
+      :type="reservationRunning ? 'success' : 'warning'"
+      show-icon
+      style="margin-bottom: 20px;"
+    />
     <!-- 座位查询部分 -->
     <el-card class="query-card">
       <template #header>
