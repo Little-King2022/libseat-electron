@@ -176,7 +176,7 @@ onMounted(() => {
       <div class="action-buttons">
         <el-button @click="submitResvList" type="primary" plain>提交预约任务</el-button>
         <el-button @click="showSeatPDF" type="info" plain>查看座位分布图</el-button>
-        <el-button v-if="showNowResvDetail" @click="deleteResvList" type="danger">删除预约任务</el-button>
+        <el-button v-if="showNowResvDetail" @click="deleteResvList" type="danger">中止并删除预约任务</el-button>
       </div>
     </el-card>
 

@@ -1,6 +1,6 @@
 <script setup>
 import SideMenu from './components/SideMenu.vue'
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 import { getTheme, applyTheme } from './utils/theme';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from './stores/userStore'
@@ -15,11 +15,16 @@ function handleSystemThemeChange(e) {
   }
 }
 
+const reservationRunning = ref(false)
+
+const checkTaskStatus = async () => {
+  reservationRunning.value = await window.api.invoke('task:is-running')
+}
 
 onMounted(async () => {
   // 程序启动时立即应用主题
   applyTheme(getTheme());
-  
+
   // 监听系统主题变化
   mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   mediaQuery.addEventListener('change', handleSystemThemeChange);
@@ -30,6 +35,10 @@ onMounted(async () => {
   if (userStore.userInfo.trueName) {
     ElMessage.success(`欢迎回来，${userStore.userInfo.trueName}！`);
   }
+
+  // 每隔5秒检查一次任务状态
+  checkTaskStatus()
+  setInterval(checkTaskStatus, 1000)
 });
 
 
@@ -47,6 +56,9 @@ onBeforeUnmount(() => {
       <SideMenu />
     </el-aside>
     <el-main>
+      <el-alert v-if="reservationRunning" title="自动预约程序运行中" type="success" show-icon :closable="false"/>
+      <el-alert v-if="!reservationRunning" title="自动预约程序未运行, 请尝试重启" type="error" show-icon :closable="false"/>
+      
       <router-view />
     </el-main>
   </el-container>
@@ -59,7 +71,8 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -78,7 +91,7 @@ html, body {
   /* background-color: #f5f7fa;
   color: #333; */
   height: 100%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .el-main {

@@ -23,11 +23,6 @@ const _4fPer = ref(0)
 const _5fPer = ref(0)
 const _6fPer = ref(0)
 const _7fPer = ref(0)
-const reservationRunning = ref(false)
-
-const checkTaskStatus = async () => {
-  reservationRunning.value = await window.api.invoke('task:is-running')
-}
 
 // 座位号查询输入
 const handleSeatInput = async () => {
@@ -59,36 +54,34 @@ const handleSeatSelect = (seat) => {
 
 // 获取图书馆数据
 const getLibraryData = async () => {
+  // resv_data
   try {
-    const lib_data = await axios.get('http://localhost:3000/api/get_inlibnum');
-    const resv_data = await axios.get('http://localhost:3000/api/get_all_resv');
-
-    if (lib_data.data.success && resv_data.data.success) {
-      // lib_data
-      console.log(lib_data.data);
-      currentCount.value = parseInt(lib_data.data.currentCount);
-      remainingCount.value = parseInt(lib_data.data.remainingCount);
-      if (remainingCount.value == 0 || currentCount.value == 0) {
-        inLibPercentage.value = 0;
-      } else {
-        inLibPercentage.value = (currentCount.value / (currentCount.value + remainingCount.value) * 100).toFixed(0);
-      }
-
-      // resv_data
-      console.log(resv_data.data);
-      resvCount.value = resv_data.data.resvCount;
-      freeCount.value = resv_data.data.freeCount;
-      if (resvCount.value == 0 || freeCount.value == 0) {
-        resvPercentage.value = 0;
-      } else {
-        resvPercentage.value = (resvCount.value / (resvCount.value + freeCount.value) * 100).toFixed(0);
-      }
+    const resv_data = await axios.get('http://localhost:3000/api/get_all_resv', { timeout: 2000 });
+    console.log(resv_data.data);
+    resvCount.value = resv_data.data.resvCount || 0;
+    freeCount.value = resv_data.data.freeCount || 0;
+    if (resvCount.value == 0 || freeCount.value == 0) {
+      resvPercentage.value = 0;
     } else {
-      ElMessage.error('获取预约人数失败: ' + resv_data.data.message);
+      resvPercentage.value = (resvCount.value / (resvCount.value + freeCount.value) * 100).toFixed(0);
     }
   } catch (error) {
     console.error(error);
-    ElMessage.error('获取预约人数失败: ' + error.message);
+    // ElMessage.error('获取预约人数失败: ' + error.message);
+  }
+  // lib_data
+  try {
+    const lib_data = await axios.get('http://localhost:3000/api/get_inlibnum', { timeout: 2000 });
+    currentCount.value = parseInt(lib_data.data.currentCount || 0);
+    remainingCount.value = parseInt(lib_data.data.remainingCount || 0);
+    if (remainingCount.value == 0 || currentCount.value == 0) {
+      inLibPercentage.value = 0;
+    } else {
+      inLibPercentage.value = (currentCount.value / (currentCount.value + remainingCount.value) * 100).toFixed(0);
+    }
+  } catch (error) {
+    console.error(error);
+    // ElMessage.error('获取在馆人数失败: ' + error.message);
   }
 }
 
@@ -169,19 +162,11 @@ onMounted(() => {
   setInterval(() => {
     getLibraryData()
   }, 60000)
-  checkTaskStatus()
-  setInterval(checkTaskStatus, 30000)
 })
 </script>
 
 <template>
   <div class="home-container">
-    <el-alert
-      :title="reservationRunning ? '自动预约程序运行中' : '自动预约程序未运行'"
-      :type="reservationRunning ? 'success' : 'warning'"
-      show-icon
-      style="margin-bottom: 20px;"
-    />
     <!-- 座位查询部分 -->
     <el-card class="query-card">
       <template #header>

@@ -17,7 +17,6 @@ function startTaskProcess() {
     shell: process.platform === 'win32'
   });
   child.unref();
-  fs.writeFileSync(PID_FILE, String(child.pid), 'utf-8');
 }
 
 function stopTaskProcess() {

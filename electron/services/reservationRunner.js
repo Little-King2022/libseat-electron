@@ -5,6 +5,7 @@ const axios = require('axios');
 const dataPath = process.env.USER_DATA_PATH || process.cwd();
 const TASK_FILE = path.join(dataPath, 'reservation-task.json');
 const LOG_FILE = path.join(dataPath, 'reservation.log');
+const PID_FILE = path.join(dataPath, 'reservation.pid');
 
 function appendLog(content) {
   const line = `[${new Date().toLocaleString('zh-CN', { hour12: false })}] ${content}\n`;
@@ -12,7 +13,14 @@ function appendLog(content) {
 }
 
 async function reserveSeat(task) {
-  // TODO: implement seat reservation logic here
+  while (true) {
+    // sleep 1 秒
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // 获取当前程序PID
+    const pid = process.pid;
+    // 将当前程序PID写入日志
+    appendLog(`当前程序PID: ${pid}`);
+  }
 }
 
 async function keepCookieAlive(cookie) {
@@ -38,6 +46,7 @@ async function keepCookieAlive(cookie) {
 }
 
 async function main() {
+  fs.writeFileSync(PID_FILE, String(process.pid), 'utf-8');
   try {
     if (!fs.existsSync(TASK_FILE)) {
       appendLog('任务配置文件不存在');
