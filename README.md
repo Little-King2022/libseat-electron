@@ -10,6 +10,7 @@ LibSeat 约个座位 基于 Electron 和 Vue.js 开发的跨平台图书馆座�
 ![image](https://github.com/user-attachments/assets/d956ab5a-e4ca-4a4b-a834-6a7e5be52a3e)
 
 - 📅 **自动预约**：创建自动预约任务，每天自动预约指定座位（最多支持5个候选列表）、查看预约程序日志、自动Cookie保活
+
 ![image](https://github.com/user-attachments/assets/72b8e641-2062-4cc4-810b-e81608c71d74)
 ![image](https://github.com/user-attachments/assets/168f59fc-2b21-4fd4-8d17-4b72d2f8a559)
 
