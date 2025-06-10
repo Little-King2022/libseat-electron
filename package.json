@@ -62,6 +62,9 @@
     "appId": "com.littleking.libseat",
     "mac": {
       "icon": "assets/icon.icns"
+    },
+    "win": {
+      "icon": "assets/icon.icns"
     }
   }
 }

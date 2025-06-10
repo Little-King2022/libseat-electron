@@ -147,6 +147,34 @@ ipcMain.handle('task:delete', () => {
   }
 })
 
+ipcMain.handle('task:is-running', () => {
+  try {
+    return taskService.isTaskRunning()
+  } catch (err) {
+    console.error('check task status error:', err)
+    return false
+  }
+})
+
+ipcMain.handle('get-resv-start-time', () => {
+  try {
+    return taskService.getResvStartTime()
+  } catch (err) {
+    console.error('get resv start time error:', err)
+    return null
+  }
+})
+
+ipcMain.handle('update-resv-start-time', (event, start_time) => {
+  try {
+    taskService.updateResvStartTime(start_time)
+    return { success: true }
+  } catch (err) {
+    console.error('update resv start time error:', err)
+    return { success: false, message: err.message }
+  }
+})
+
 let win = null;
 
 function createWindow() {

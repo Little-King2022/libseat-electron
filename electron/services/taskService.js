@@ -1,13 +1,51 @@
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 const { app } = require('electron');
 
 const dataPath = app.getPath('userData');
 const TASK_FILE = path.join(dataPath, 'reservation-task.json');
 const LOG_FILE = path.join(dataPath, 'reservation.log');
+const PID_FILE = path.join(dataPath, 'reservation.pid');
+const START_TIME = path.join(dataPath, 'start.time');
+
+function startTaskProcess() {
+  const script = path.join(__dirname, 'reservationRunner.js');
+  const child = spawn(process.execPath, [script], {
+    detached: true,
+    stdio: 'ignore',
+    env: { ...process.env, ELECTRON_RUN_AS_NODE: '1', USER_DATA_PATH: dataPath },
+    shell: process.platform === 'win32'
+  });
+  child.unref();
+}
+
+function stopTaskProcess() {
+  if (!fs.existsSync(PID_FILE)) return;
+  try {
+    const pid = parseInt(fs.readFileSync(PID_FILE, 'utf-8'), 10);
+    if (!isNaN(pid)) process.kill(pid);
+  } catch (e) {
+    console.warn('failed to stop reservation process', e);
+  }
+  fs.unlinkSync(PID_FILE);
+}
+
+function isTaskRunning() {
+  if (!fs.existsSync(PID_FILE)) return false;
+  try {
+    const pid = parseInt(fs.readFileSync(PID_FILE, 'utf-8'), 10);
+    if (isNaN(pid)) return false;
+    process.kill(pid, 0);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 function saveTask(task) {
   fs.writeFileSync(TASK_FILE, JSON.stringify(task, null, 2), 'utf-8');
+  startTaskProcess();
 }
 
 function loadTask() {
@@ -18,6 +56,7 @@ function loadTask() {
 }
 
 function deleteTask() {
+  stopTaskProcess();
   if (fs.existsSync(TASK_FILE)) {
     fs.unlinkSync(TASK_FILE);
   }
@@ -37,10 +76,26 @@ function readLog() {
   return '';
 }
 
+function getResvStartTime() {
+  if (fs.existsSync(START_TIME)) {
+    return fs.readFileSync(START_TIME, 'utf-8');
+  }
+  return '';
+}
+
+function updateResvStartTime(start_time){
+  fs.writeFileSync(START_TIME, start_time, 'utf-8');
+}
+
 module.exports = {
   saveTask,
   loadTask,
   deleteTask,
   appendLog,
   readLog,
+  startTaskProcess,
+  stopTaskProcess,
+  isTaskRunning,
+  getResvStartTime,
+  updateResvStartTime
 };
