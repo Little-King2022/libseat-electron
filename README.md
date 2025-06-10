@@ -1,5 +1,10 @@
 # LibSeat 约个座位 - 图书馆座位预约App
 
+<p align="center">
+    <a href="./LICENSE"><img src="https://img.shields.io/github/license/Little-King2022/libseat-electron"></a>
+    <a href="https://github.com/Little-King2022/libseat-electron/releases/latest"><img src="https://img.shields.io/github/v/release/Little-King2022/libseat-electron?color=ffa"></a>
+    <a href="https://github.com/Little-King2022/libseat-electron/releases/latest"><img src="https://img.shields.io/github/downloads/Little-King2022/libseat-electron/total?label=downloads"></a>
+</p>
 LibSeat 约个座位 基于 Electron 和 Vue.js 开发的跨平台图书馆座位预约桌面应用程序，提供便捷的自动预约、预约查询管理功能，帮助大家更好地使用图书馆座位资源。
 
 ## 主要功能
