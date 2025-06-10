@@ -118,6 +118,9 @@ export const useUserStore = defineStore('user', {
       const credit = await window.api.invoke('get-user-credit')
       console.log('credit', credit)
       this.userInfo.credit = credit[8]
+      // 获取预约开始时间
+      const resvStartTime = await window.api.invoke('get-resv-start-time')
+      this.userInfo.resv_start_time = resvStartTime
     }
   },
 

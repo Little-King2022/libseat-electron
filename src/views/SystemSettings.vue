@@ -2,12 +2,6 @@
   <div class="system-settings">
     <h2>系统设置</h2>
     <el-form label-width="120px" style="padding-top: 20px;">
-      <!-- <el-form-item label="通知设置">
-        <el-switch v-model="settings.notifications" />
-      </el-form-item>
-      <el-form-item label="自动更新">
-        <el-switch v-model="settings.autoUpdate" />
-      </el-form-item> -->
       <el-form-item label="主题">
         <el-select v-model="settings.theme" placeholder="请选择主题">
           <el-option label="浅色" value="light"></el-option>
@@ -15,6 +9,35 @@
           <el-option label="跟随系统" value="auto"></el-option>
         </el-select>
       </el-form-item>
+      <!-- 设置预约开始时间，下拉选择框，8:00/9:00/10:00 -->
+      <el-form-item label="预约开始时间">
+        <el-select v-model="settings.start_time" placeholder="请选择预约开始时间">
+          <el-option label="8:00" value="08:00"></el-option>
+          <el-option label="8:30" value="08:30"></el-option>
+          <el-option label="9:00" value="09:00"></el-option>
+          <el-option label="9:30" value="09:30"></el-option>
+          <el-option label="10:00" value="10:00"></el-option>
+          <el-option label="10:30" value="10:30"></el-option>
+          <el-option label="11:00" value="11:00"></el-option>
+          <el-option label="11:30" value="11:30"></el-option>
+          <el-option label="12:00" value="12:00"></el-option>
+          <el-option label="12:30" value="12:30"></el-option>
+          <el-option label="13:00" value="13:00"></el-option>
+          <el-option label="13:30" value="13:30"></el-option>
+          <el-option label="14:00" value="14:00"></el-option>
+          <el-option label="14:30" value="14:30"></el-option>
+          <el-option label="15:00" value="15:00"></el-option>
+          <el-option label="15:30" value="15:30"></el-option>
+          <el-option label="16:00" value="16:00"></el-option>
+          <el-option label="16:30" value="16:30"></el-option>
+          <el-option label="17:00" value="17:00"></el-option>
+          <el-option label="17:30" value="17:30"></el-option>
+          <el-option label="18:00" value="18:00"></el-option>
+          <el-option label="18:30" value="18:30"></el-option>
+          <el-option label="19:00" value="19:00"></el-option>
+        </el-select>
+      </el-form-item>
+      <!-- 设置预约结束时间，下拉选择框，18:00/19:00/20:00 -->
       <!-- 更新数据库 -->
       <el-form-item label="数据库">
         <el-button type="primary" @click="updateDatabase" style="width: 180px;">更新图书馆数据库</el-button>
@@ -33,12 +56,25 @@ import { useUserStore } from '../stores/userStore';
 const settings = reactive({
   notifications: true,
   autoUpdate: false,
-  theme: getTheme()
+  theme: getTheme(),
+  start_time: useUserStore().userInfo.resv_start_time,
 });
 
 watch(() => settings.theme, (val) => {
   setTheme(val);
   applyTheme(val);
+});
+
+// 更新useUserStore().userInfo.resv_start_time
+watch(() => settings.start_time, (val) => {
+  useUserStore().userInfo.resv_start_time = val;
+  window.api.invoke('update-resv-start-time', val).then(res => {
+    if (res.success) {
+      ElMessage.success('预约开始时间更新成功');
+    } else {
+      ElMessage.error('预约开始时间更新失败');
+    }
+  });
 });
 
 // updateDatadase

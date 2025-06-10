@@ -89,8 +89,8 @@ watch(() => systemSetting.value, (newVal) => {
           <el-descriptions-item v-if="userStore.userInfo.is_vip" label="通知方式">
             开发中
           </el-descriptions-item>
-          <el-descriptions-item v-if="userStore.userInfo.is_vip" label="设置预约时段">
-            {{ userStore.userInfo.resv_start_time ? userStore.userInfo.resv_start_time + '~22:00' : '暂未设置' }}
+          <el-descriptions-item v-if="userStore.userInfo.resv_start_time" label="自动预约时段">
+            {{ userStore.userInfo.resv_start_time ? userStore.userInfo.resv_start_time + '~22:00（周五20:00结束）' : '暂未设置' }}
           </el-descriptions-item>
         </el-descriptions>
       </template>

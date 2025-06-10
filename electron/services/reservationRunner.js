@@ -6,6 +6,7 @@ const dataPath = process.env.USER_DATA_PATH || process.cwd();
 const TASK_FILE = path.join(dataPath, 'reservation-task.json');
 const LOG_FILE = path.join(dataPath, 'reservation.log');
 const PID_FILE = path.join(dataPath, 'reservation.pid');
+const START_TIME = path.join(dataPath, 'start.time');
 
 function writePidFile() {
   fs.writeFileSync(PID_FILE, String(process.pid), 'utf-8');
@@ -84,7 +85,11 @@ async function startReservation(startTime, devIdList, endTime, user) {
 
   while (true) {
     if (attempts >= 20) {
-      appendLog(`尝试次数过多，终止抢座 ${user.stuId}`);
+      appendLog(`尝试次数过多，终止抢座: ${user.stuId}`);
+      // 更新TASK_FILE中的result字段
+      const task = JSON.parse(fs.readFileSync(TASK_FILE, 'utf-8'));
+      task.result = `尝试次数过多，终止抢座: ${user.stuId}, ${user.stuName}`;
+      fs.writeFileSync(TASK_FILE, JSON.stringify(task, null, 2), 'utf-8');
       return;
     }
 
@@ -94,6 +99,10 @@ async function startReservation(startTime, devIdList, endTime, user) {
 
     if (result === "新增成功") {
       appendLog(`预约成功: ${user.stuId}, ${user.stuName}, 座位: ${devId}`);
+      // 更新TASK_FILE中的result字段
+      const task = JSON.parse(fs.readFileSync(TASK_FILE, 'utf-8'));
+      task.result = `预约成功: ${user.stuId}, ${user.stuName}, 座位: ${devId}`;
+      fs.writeFileSync(TASK_FILE, JSON.stringify(task, null, 2), 'utf-8');
       return;
     } else if (result.includes("设备在该时间段内已被预约") || result.includes("当前设备正在被预约")) {
       appendLog(`设备已被预约，尝试下一个: ${devId}`);
@@ -103,6 +112,10 @@ async function startReservation(startTime, devIdList, endTime, user) {
       }
     } else if (result.includes("用户未登录") || result.includes("处罚期") || result.includes("有预约")) {
       appendLog(`用户不可预约: ${result}`);
+      // 更新TASK_FILE中的result字段
+      const task = JSON.parse(fs.readFileSync(TASK_FILE, 'utf-8'));
+      task.result = `用户不可预约: ${user.stuId}, ${user.stuName}, 原因: ${result}`;
+      fs.writeFileSync(TASK_FILE, JSON.stringify(task, null, 2), 'utf-8');
       return;
     } else {
       appendLog(`其他错误: ${result}`);
@@ -142,7 +155,13 @@ function computeReservationTime() {
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const dateStr = formatDate(tomorrow);  // 本地时间，格式为 YYYY-MM-DD
 
-  const startTime = `${dateStr} 08:00:00`;
+  // 读取start.time文件，如果存在则使用该时间，否则使用8:00
+  const startTimeSetting = fs.existsSync(START_TIME) ? fs.readFileSync(START_TIME, 'utf-8') : '08:00';
+  // 使用正则表达式检查startTimeSetting是否为HH:MM格式
+  const startTimeRegex = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+  var startTime = startTimeRegex.test(startTimeSetting) ? startTimeSetting : '08:00';
+  startTime = `${dateStr} ${startTime}:00`;
+
   const isThursday = now.getDay() === 4;
   const endTime = `${dateStr} ${isThursday ? '20:00:00' : '22:00:00'}`;
 

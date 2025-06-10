@@ -18,9 +18,6 @@ const taskCreateTime = ref('')
 const taskSeatNameList = ref('')
 const lastResvResult = ref('')
 const lastResvLog = ref('')
-const user = ref({
-  resv_start_time: '8:00'
-})
 
 // 座位号查询输入
 const handleResvSeatInput = async () => {
@@ -80,7 +77,7 @@ const submitResvList = async () => {
       id: seatId.toString(),
       name: resvSeatNameList.value[index].toString()
     })),
-    startTime: user.value.resv_start_time || '8:00',
+    startTime: userStore.userInfo.resv_start_time || '8:00',
     createdAt: new Date().toLocaleString('zh-CN', { hour12: false }),
     result: ''
   }
@@ -193,8 +190,8 @@ onMounted(() => {
         <el-descriptions-item label="预约账户">{{ userStore.userInfo.logonName + ' ' + userStore.userInfo.trueName }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ taskCreateTime }}</el-descriptions-item>
         <el-descriptions-item label="预约时段">
-          <template v-if="user.resv_start_time">
-            {{ user.resv_start_time + '~22:00（周五20:00结束）' }}
+          <template v-if="userStore.userInfo.resv_start_time">
+            {{ userStore.userInfo.resv_start_time + '~22:00（周五20:00结束）' }}
           </template>
           <template v-else>
             <span style="color: rgba(255, 0, 0, 0.808);">未设置，默认为8:00～22:00（周五20:00结束）</span>

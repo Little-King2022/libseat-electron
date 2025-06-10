@@ -7,6 +7,7 @@ const dataPath = app.getPath('userData');
 const TASK_FILE = path.join(dataPath, 'reservation-task.json');
 const LOG_FILE = path.join(dataPath, 'reservation.log');
 const PID_FILE = path.join(dataPath, 'reservation.pid');
+const START_TIME = path.join(dataPath, 'start.time');
 
 function startTaskProcess() {
   const script = path.join(__dirname, 'reservationRunner.js');
@@ -75,6 +76,17 @@ function readLog() {
   return '';
 }
 
+function getResvStartTime() {
+  if (fs.existsSync(START_TIME)) {
+    return fs.readFileSync(START_TIME, 'utf-8');
+  }
+  return '';
+}
+
+function updateResvStartTime(start_time){
+  fs.writeFileSync(START_TIME, start_time, 'utf-8');
+}
+
 module.exports = {
   saveTask,
   loadTask,
@@ -84,4 +96,6 @@ module.exports = {
   startTaskProcess,
   stopTaskProcess,
   isTaskRunning,
+  getResvStartTime,
+  updateResvStartTime
 };
