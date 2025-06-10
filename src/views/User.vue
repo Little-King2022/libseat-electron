@@ -73,8 +73,9 @@ watch(() => systemSetting.value, (newVal) => {
               <el-tag v-if="userStore.userInfo.credit < 200" type="warning">信用分不足，请注意保持哦</el-tag>
               <el-tag v-if="userStore.userInfo.credit < 100" type="danger">信用分不足，无法预约座位哦</el-tag>
             </div>
-            <div v-if="userStore.userInfo.logonName">{{ userStore.userInfo.logonName + ' ' + userStore.userInfo.trueName }}</div>
-            
+            <div v-if="userStore.userInfo.logonName">{{ userStore.userInfo.logonName + ' ' + userStore.userInfo.trueName
+            }}</div>
+
           </template>
         </div>
       </div>
@@ -84,7 +85,7 @@ watch(() => systemSetting.value, (newVal) => {
             {{ userStore.userInfo.credit }} / 600 分
           </el-descriptions-item>
           <el-descriptions-item label="绑定手机号">
-            {{ userStore.userInfo.handPhone ? userStore.userInfo.handPhone : '未绑定，请前往学校官网进行绑定' }} 
+            {{ userStore.userInfo.handPhone ? userStore.userInfo.handPhone : '未绑定，请前往学校官网进行绑定' }}
           </el-descriptions-item>
           <el-descriptions-item v-if="userStore.userInfo.is_vip" label="通知方式">
             开发中
@@ -125,7 +126,15 @@ watch(() => systemSetting.value, (newVal) => {
     </el-card>
     <div class="version-info">
       <p>Version: {{ version }}</p>
-      <p>苏ICP备2023036460号-1X</p>
+      <p>
+        <img src="https://img.shields.io/github/license/Little-King2022/libseat-electron">
+        &nbsp;
+        <a href="https://github.com/Little-King2022/libseat-electron/releases/latest"><img
+            src="https://img.shields.io/github/v/release/Little-King2022/libseat-electron?color=ffa"></a>
+        &nbsp;
+        <a href="https://github.com/Little-King2022/libseat-electron/releases/latest"><img
+            src="https://img.shields.io/github/downloads/Little-King2022/libseat-electron/total?label=downloads"></a>
+      </p>
     </div>
   </div>
 </template>
@@ -178,7 +187,7 @@ watch(() => systemSetting.value, (newVal) => {
   text-align: center;
   color: #909399;
   font-size: 12px;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .version-info p {

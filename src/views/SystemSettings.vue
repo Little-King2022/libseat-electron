@@ -39,19 +39,27 @@
       </el-form-item>
       <!-- 设置预约结束时间，下拉选择框，18:00/19:00/20:00 -->
       <!-- 更新数据库 -->
-      <el-form-item label="数据库">
-        <el-button type="primary" @click="updateDatabase" style="width: 180px;">更新图书馆数据库</el-button>
+      <el-form-item label="系统数据库">
+        <el-button type="primary" @click="updateDatabase" style="width: 180px;">更新系统数据库</el-button>
       </el-form-item>
+      <el-form-item label="软件更新">
+        <el-button style="width: 180px;" @click="openUpdateLink">
+          检查软件更新
+        </el-button>
+      </el-form-item>
+
 
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, watch, h } from 'vue';
+import { reactive, ref, watch, h, onMounted } from 'vue';
 import { getTheme, setTheme, applyTheme } from '../utils/theme';
-import { ElNotification, ElMessage, ElLoading } from 'element-plus';
+import { ElNotification, ElMessage, ElLoading, ElMessageBox } from 'element-plus';
 import { useUserStore } from '../stores/userStore';
+
+const version = ref('')
 
 const settings = reactive({
   notifications: true,
@@ -102,20 +110,20 @@ const updateDatabase = () => {
     updateDatabaseStatus.value = '正在更新楼层列表...';
     window.api.invoke('update-seat-menu-database').then((res) => {
       updateDatabaseStatus.value = res.message;
-        if (res.success) {
-          updateDatabaseStatus.value = '正在更新座位列表...';
-          window.api.invoke('update-seat-list-database').then(res => {
-            updateDatabaseStatus.value = res.message;
-            if (res.success) {
-              updateDatabaseStatus.value = '座位列表更新成功';
-              ElMessage.success('数据库更新成功');
-              // 更新系统设置状态，避免需要重启
-              useUserStore().systemSetting.has_init = 1;
-            } else {
-              ElMessage.error('座位数据库更新失败');
-            }
-            loading.close();
-          });
+      if (res.success) {
+        updateDatabaseStatus.value = '正在更新座位列表...';
+        window.api.invoke('update-seat-list-database').then(res => {
+          updateDatabaseStatus.value = res.message;
+          if (res.success) {
+            updateDatabaseStatus.value = '座位列表更新成功';
+            ElMessage.success('数据库更新成功');
+            // 更新系统设置状态，避免需要重启
+            useUserStore().systemSetting.has_init = 1;
+          } else {
+            ElMessage.error('座位数据库更新失败');
+          }
+          loading.close();
+        });
       } else {
         ElMessage.error('楼层数据库更新失败');
         loading.close();
@@ -128,6 +136,24 @@ const updateDatabase = () => {
   }, 500);
 
 }
+const openUpdateLink = () => {
+  // 显示弹窗
+  ElMessageBox.confirm('当前软件版本号 v' + version.value + '，点击确定后，请拉动到页面底部，查看是否有新版本发布', '软件更新', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    // 打开更新链接
+    window.open('https://github.com/Little-King2022/libseat-electron/releases/latest', '_blank');
+  }).catch(() => {
+    // 取消更新
+  });
+}
+
+onMounted(async () => {
+  version.value = await window.api.invoke('get-app-version')
+});
+
 </script>
 
 <style scoped>
