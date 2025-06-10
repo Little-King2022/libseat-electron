@@ -102,18 +102,20 @@ const updateDatabase = () => {
     updateDatabaseStatus.value = '正在更新楼层列表...';
     window.api.invoke('update-seat-menu-database').then((res) => {
       updateDatabaseStatus.value = res.message;
-      if (res.success) {
-        updateDatabaseStatus.value = '正在更新座位列表...';
-        window.api.invoke('update-seat-list-database').then(res => {
-          updateDatabaseStatus.value = res.message;
-          if (res.success) {
-            updateDatabaseStatus.value = '座位列表更新成功';
-            ElMessage.success('数据库更新成功');
-          } else {
-            ElMessage.error('座位数据库更新失败');
-          }
-          loading.close();
-        });
+        if (res.success) {
+          updateDatabaseStatus.value = '正在更新座位列表...';
+          window.api.invoke('update-seat-list-database').then(res => {
+            updateDatabaseStatus.value = res.message;
+            if (res.success) {
+              updateDatabaseStatus.value = '座位列表更新成功';
+              ElMessage.success('数据库更新成功');
+              // 更新系统设置状态，避免需要重启
+              useUserStore().systemSetting.has_init = 1;
+            } else {
+              ElMessage.error('座位数据库更新失败');
+            }
+            loading.close();
+          });
       } else {
         ElMessage.error('楼层数据库更新失败');
         loading.close();
