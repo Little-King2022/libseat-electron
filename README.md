@@ -1,11 +1,26 @@
 # LibSeat 约个座位 - 图书馆座位预约App
 
+LibSeat 约个座位 基于 Electron 和 Vue.js 开发的跨平台图书馆座位预约桌面应用程序，提供便捷的自动预约、预约查询管理功能，帮助大家更好地使用图书馆座位资源。
+
+### Congratulation 🎉🎉🎉
+
+✨Libseat约个座位正式版 v0.1.0 发布<br>
+✨自动预约功能可以正常使用啦，欢迎[下载体验](https://github.com/Little-King2022/libseat-electron/releases/latest)<br>
+🤗使用过程中有任何问题请[提交Issue](https://github.com/Little-King2022/libseat-electron/issues)，帮助我们共同完善此项目
+
+### 使用注意事项
+1. 需要校园网或VPN连接
+2. 创建预约任务后，电脑须保持联网，可以锁屏，不能睡眠、休眠或关机。主窗口关闭不影响后台任务执行
+3. 当前只支持单次预约，即每次预约成功后，需要重新提交预约任务，才能预约下一次的座位
+
 <p align="center">
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/Little-King2022/libseat-electron"></a>
     <a href="https://github.com/Little-King2022/libseat-electron/releases/latest"><img src="https://img.shields.io/github/v/release/Little-King2022/libseat-electron?color=ffa"></a>
     <a href="https://github.com/Little-King2022/libseat-electron/releases/latest"><img src="https://img.shields.io/github/downloads/Little-King2022/libseat-electron/total?label=downloads"></a>
 </p>
-LibSeat 约个座位 基于 Electron 和 Vue.js 开发的跨平台图书馆座位预约桌面应用程序，提供便捷的自动预约、预约查询管理功能，帮助大家更好地使用图书馆座位资源。
+<hr/>
+
+
 
 ## 主要功能
 
